@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'users',
+    'tailwind',
+    'theme',
 ]
 
 MIDDLEWARE = [
@@ -120,3 +122,7 @@ STATIC_URL = 'static/'
 # Campos personalizados para el user
 
 AUTH_USER_MODEL = 'users.usuario'
+
+TAILWIND_APP_NAME = 'theme'
+
+NPM_BIN_PATH = r"C:\nvm4w\nodejs\npm.cmd"
