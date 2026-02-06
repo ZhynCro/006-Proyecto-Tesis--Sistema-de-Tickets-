@@ -62,7 +62,7 @@ def user_create (request):
     else:
         form = UsuarioCreationForm()
 
-    return render(request, 'create_user.html', {'form': form})
+    return render(request, 'user_create.html', {'form': form})
 
 def user_view(request):
     user_model = get_user_model()
@@ -81,5 +81,3 @@ def user_edit(request, user_id):
             return redirect('user_view')
     else:
         form = UsuarioUpdateForm(instance=usuario)
-
-    return render(request, 'user_edit.html', {'form': form, 'usuario': usuario})
