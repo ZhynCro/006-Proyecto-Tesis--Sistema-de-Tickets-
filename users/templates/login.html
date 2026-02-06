@@ -5,8 +5,8 @@
 {% block content %}
 <div class="flex items-center justify-center h-full">
 <div class="w-full max-w-md bg-base-100 p-8 rounded-lg shadow-lg">
-        <h2 class="text-2xl font-bold mb-2 text-center">Acceso de Usuario</h2>
-        <p class="text-sm text-gray-500 mb-6 text-center">Ingresa tu ID de empleado para continuar.</p>
+        <h2 class="text-2xl font-bold mb-2 text-center">Acceso</h2>
+        <p class="text-sm text-gray-500 mb-6 text-center">Ingresa tu numero de empleado para continuar.</p>
 
         {% if messages %}
             <div class="mb-4 space-y-2">
@@ -21,7 +21,7 @@
         <form method="post" action="{% url 'login' %}">
             {% csrf_token %}
             <div class="mb-6">
-                <label for="ID_empleado" class="block text-gray-700 mb-2">ID_empleado</label>
+                <label for="ID_empleado" class="block text-gray-700 mb-2">Empleado</label>
                 <input
                     type="text"
                     name="ID_empleado"

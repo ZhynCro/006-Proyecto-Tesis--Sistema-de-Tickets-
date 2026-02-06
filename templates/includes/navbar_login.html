@@ -3,24 +3,6 @@
     <a href="{% url 'login' %}" class="btn btn-ghost text-base font-semibold">Sistema de Tickets</a>
   </div>
   <div class="flex-none gap-2">
-    <button class="btn btn-ghost btn-circle">
-      <div class="indicator">
-        <i class="fa-regular fa-bell text-lg"></i>
-        <span class="badge badge-sm badge-primary indicator-item">3</span>
-      </div>
-    </button>
-    <div class="dropdown dropdown-end">
-      <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
-        <div class="w-10 rounded-full">
-          <img src="https://ui-avatars.com/api/?name=Usuario+Tesis&background=random" alt="avatar" />
-        </div>
-      </div>
-      <ul tabindex="0" class="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52">
-        <li><a>Mi Perfil</a></li>
-        <li><a>Configuración</a></li>
-        <li><a class="text-error">Cerrar Sesión</a></li>
-      </ul>
-    </div>
       <a href="{% url 'admin_login' %}" class="btn btn-outline btn-primary btn-sm">
         Acceso administrativo
       </a>
