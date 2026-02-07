@@ -22,7 +22,7 @@
         </div>
     {% endif %}
 
-    <form method="post" id="users-form" class="space-y-4">
+    <form method="post" id="users-form" action="{% url 'user_delete' %}" class="space-y-4">
         {% csrf_token %}
         <div class="flex justify-end">
             <button

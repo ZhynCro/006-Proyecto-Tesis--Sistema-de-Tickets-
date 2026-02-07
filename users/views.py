@@ -69,6 +69,26 @@ def user_view(request):
     usuarios = user_model.objects.select_related('departamento', 'sede').order_by('ID_empleado')
     return render(request, 'user_view.html', {'usuarios': usuarios})
 
+def user_delete(request):
+    if request.method != 'POST':
+        return redirect('user_view')
+
+    selected_users = request.POST.getlist('selected_users')
+
+    if not selected_users:
+        messages.error(request, 'Debes seleccionar al menos un usuario para borrar.')
+        return redirect('user_view')
+
+    user_model = get_user_model()
+    deleted_count, _ = user_model.objects.filter(id__in=selected_users).delete()
+
+    if deleted_count:
+        messages.success(request, 'Usuarios eliminados correctamente.')
+    else:
+        messages.error(request, 'No se encontraron usuarios para borrar.')
+
+    return redirect('user_view')
+
 def user_edit(request, user_id):
     user_model = get_user_model()
     usuario = get_object_or_404(user_model, pk=user_id)
