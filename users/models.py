@@ -47,6 +47,7 @@ class departamento(models.Model):
         verbose_name_plural = "departamentos"
     
 class sede(models.Model):
+    codigo = models.CharField(max_length=3, unique=True)
     nombre = models.CharField(max_length=50, unique=True)
 
     departamentos = models.ManyToManyField(
@@ -54,6 +55,8 @@ class sede(models.Model):
         related_name='sedes',
         help_text="Departamentos en esta sede"
         )
+    
+
 
     def __str__(self):
         return self.nombre
