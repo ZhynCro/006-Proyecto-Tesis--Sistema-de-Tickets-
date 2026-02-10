@@ -82,7 +82,6 @@ def user_edit(request, user_id):
             messages.success(request, 'Usuario actualizado correctamente.')
             return redirect('user_view')
     else:
-        print(f"Usuario a editar: {usuario}")  # Debug: Verificar el usuario que se está editando
         form = UsuarioUpdateForm(instance=usuario)
 
         return render(request, 'user_edit.html', {'form': form, 'usuario': usuario})
