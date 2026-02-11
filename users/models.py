@@ -47,8 +47,14 @@ class departamento(models.Model):
         verbose_name_plural = "departamentos"
     
 class sede(models.Model):
-    codigo = models.CharField(max_length=3, unique=True)
-    nombre = models.CharField(max_length=50, unique=True)
+    codigo = models.CharField(
+        max_length=3, 
+        unique=True, 
+        help_text="Codigo de sede de 3 caracteres")
+    
+    nombre = models.CharField(
+        max_length=50, 
+        unique=True)
 
     departamentos = models.ManyToManyField(
         departamento,
