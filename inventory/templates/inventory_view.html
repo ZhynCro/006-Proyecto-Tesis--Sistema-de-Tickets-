@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block title %}Listado de Activos{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+            <h1 class="text-2xl font-bold">Equipos</h1>
+            <p class="text-sm text-gray-500">Equipos actualmente regitrados</p>
+        </div>
+        <a href="{% url 'inventory_create' %}" class="btn btn-primary btn-sm">Registrar activo</a>
+    </div>
+
+    {% if messages %}
+        <div class="space-y-2">
+            {% for message in messages %}
+                <div class="alert {% if message.tags == 'error' %}alert-error{% else %}alert-success{% endif %}">
+                    <span>{{ message }}</span>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <form method="post" action="{% url 'inventory_delete' %}" class="space-y-4">
+        {% csrf_token %}
+        <div class="flex justify-end">
+            <button type="submit" id="delete-button" class="btn btn-error btn-sm hidden">Borrar seleccionados</button>
+        </div>
+
+        <div class="overflow-x-auto bg-base-100 rounded-lg shadow">
+            <table class="table w-full">
+                <thead>
+                    <tr>
+                        <th><input type="checkbox" id="select-all" class="checkbox checkbox-sm" /></th>
+                        <th>Código</th>
+                        <th>Categoría</th>
+                        <th>Marca</th>
+                        <th>Modelo</th>
+                        <th>Serial</th>
+                        <th>Sede</th>
+                        <th>Usuario asignado</th>
+                        <th>Departamento</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for activo in activos %}
+                        <tr>
+                            <td>
+                                <input type="checkbox" name="activos_seleccionados" value="{{ activo.codigo }}" class="checkbox checkbox-sm row-checkbox" />
+                            </td>
+                            <td>{{ activo.codigo }}</td>
+                            <td>{{ activo.categoria }}</td>
+                            <td>{{ activo.marca }}</td>
+                            <td>{{ activo.modelo }}</td>
+                            <td>{{ activo.serial }}</td>
+                            <td>{{ activo.sede }}</td>
+                            <td>{{ activo.usuario_asignado|default:'Sin asignar' }}</td>
+                            <td>{{ activo.departamento }}</td>
+                            <td>{{ activo.estado }}</td>
+                            <td>
+                                <a href="{% url 'inventory_edit' activo.codigo %}" class="btn btn-ghost btn-xs">Editar</a>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="11" class="text-center text-gray-500 py-6">No hay activos activos registrados.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </form>
+</div>
+
+<script>
+    const deleteButton = document.getElementById('delete-button');
+    const checkboxes = document.querySelectorAll('.row-checkbox');
+    const selectAll = document.getElementById('select-all');
+
+    const updateDeleteButton = () => {
+        const anyChecked = Array.from(checkboxes).some((checkbox) => checkbox.checked);
+        deleteButton.classList.toggle('hidden', !anyChecked);
+    };
+
+    checkboxes.forEach((checkbox) => {
+        checkbox.addEventListener('change', updateDeleteButton);
+    });
+
+    if (selectAll) {
+        selectAll.addEventListener('change', (event) => {
+            checkboxes.forEach((checkbox) => {
+                checkbox.checked = event.target.checked;
+            });
+            updateDeleteButton();
+        });
+    }
+</script>
+{% endblock %}
