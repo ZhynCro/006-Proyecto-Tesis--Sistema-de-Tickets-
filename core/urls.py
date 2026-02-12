@@ -22,5 +22,5 @@ urlpatterns = [
     path('users/', include('users.urls')),
     path('inventory/', include('inventory.urls')),
     path("__reload__/", include("django_browser_reload.urls")),
-    path('', include('users.urls')),  # Redirige la raíz al módulo de usuarios
+    path('', include('dashboard.urls')),
 ]

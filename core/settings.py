@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'users',
     'tickets',
     'inventory',
+    'dashboard',
     'tailwind',
     'theme',
     'django_browser_reload',
