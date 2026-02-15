@@ -47,5 +47,7 @@ class activos(models.Model):
     )
     estado = models.CharField(max_length=50) #'Activo', 'Inactivo', 'Dado de baja'
 
+    verbose_name_plural = "activos"
+
     def __str__(self):
         return f"{self.codigo} - {self.marca} {self.modelo}"
