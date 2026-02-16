@@ -1,6 +1,7 @@
 from django.db import models
 
 class activos_categoria(models.Model):
+    codigo = models.CharField(max_length=50, unique=True, null=True)
     nombre = models.CharField(max_length=100, unique=True)
     descripcion = models.TextField(blank=True)
 

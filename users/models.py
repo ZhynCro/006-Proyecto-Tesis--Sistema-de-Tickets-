@@ -38,6 +38,7 @@ class usuario(AbstractUser):
         return f"{self.ID_empleado} - {self.get_full_name()}"
     
 class departamento(models.Model):
+    codigo = models.CharField(max_length=10, unique=True, null=True)
     nombre = models.CharField(max_length=50, unique=True)
 
     def __str__(self):
