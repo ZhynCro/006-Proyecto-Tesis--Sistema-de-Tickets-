@@ -2,11 +2,11 @@ from django.db import models
 
 class matriz_prioridad(models.Model):
     prioridad = models.CharField(max_length=20, unique=True)
-    tiempo_respuesta_horas = models.IntegerField()
-    tiempo_resolucion_horas = models.IntegerField()
+    tiempo_respuesta_minutos = models.IntegerField()
+    tiempo_resolucion_minutos = models.IntegerField()
 
     def __str__(self):
-        return f"{self.prioridad} (Respuesta: {self.tiempo_respuesta_horas}h, Resolución: {self.tiempo_resolucion_horas}h)"
+        return f"{self.prioridad} (Respuesta: {self.tiempo_respuesta_minutos}m, Resolución: {self.tiempo_resolucion_minutos}m)"
 
 
 class tickets(models.Model):
@@ -18,7 +18,8 @@ class tickets(models.Model):
         on_delete=models.PROTECT,
         to_field='prioridad',
         db_column='prioridad',
-        related_name='tickets'
+        related_name='tickets',
+        default='N/A'
     )
     estado = models.CharField(max_length=30)
     solicitante = models.ForeignKey(
@@ -41,7 +42,7 @@ class tickets(models.Model):
         to_field='codigo',
         db_column='activo_afectado',
         related_name='tickets_afectados',
-        limit_choices_to={'estado': 'Activo'}
+        limit_choices_to={'estado': 'activo'}
 )
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_resolucion = models.DateTimeField(null=True, blank=True)
