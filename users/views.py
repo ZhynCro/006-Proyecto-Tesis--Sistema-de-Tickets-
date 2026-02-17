@@ -30,7 +30,7 @@ def login_view(request):
         if usuario.objects.filter(ID_empleado=id_empleado).exists():
             request.session['ID_empleado'] = id_empleado
             #messages.success(request, 'ID de empleado registrado correctamente.')
-            return redirect('user_view')
+            return redirect('tickets_create')
         else:
             messages.error(request, 'ID de empleado no encontrado. Verifique la información ingresada.')
             return render(request, 'login.html')

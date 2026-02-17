@@ -7,16 +7,24 @@ from tickets.forms import TicketCreationForm, TicketUpdateForm
 from tickets.models import tickets
 
 
-def ticket_view(request):
+def tickets_view(request):
     tickets_registrados = (
-        tickets.objects.select_related('categoria', 'titulo', 'sede', 'usuario', 'departamento')
+        tickets.objects.select_related('activo_afectado', 'prioridad', 'solicitante', 'usuario')
         .filter(estado__iexact='abierto')
         .order_by('fecha_creacion')
     )
     return render(request, 'tickets_view.html', {'tickets': tickets_registrados})
 
+def tickets_view_self(request):
+    tickets_asignados = (
+        tickets.objects.select_related('activo_afectado', 'prioridad', 'solicitante', 'usuario')
+        .filter(usuario=request.user, estado__iexact='abierto')
+        .order_by('fecha_creacion')
+    )
+    return render(request, 'tickets_view_self.html', {'tickets': tickets_asignados})
 
-def inventory_create(request):
+
+def tickets_create(request):
     if request.method == 'POST':
         form = TicketCreationForm(request.POST)
         if form.is_valid():
@@ -29,7 +37,7 @@ def inventory_create(request):
     return render(request, 'tickets_create.html', {'form': form})
 
 
-def inventory_edit(request, id):
+def tickets_edit(request, id):
     ticket = get_object_or_404(tickets, pk=id)
 
     if request.method == 'POST':
@@ -44,7 +52,7 @@ def inventory_edit(request, id):
     return render(request, 'tickets_edit.html', {'form': form, 'ticket': ticket})
 
 
-def inventory_delete(request):
+def tickets_delete(request):
     if request.method != 'POST':
         return redirect('ticket_view')
 

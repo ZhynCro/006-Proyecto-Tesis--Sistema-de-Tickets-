@@ -7,9 +7,12 @@ class TicketCreationForm(forms.ModelForm):
         fields = (
             'titulo',
             'descripcion',
-            'categoria',
             'activo_afectado',
         )
+        widgets = {
+            'titulo': forms.TextInput(attrs={'placeholder': 'Título del ticket'}),
+            'descripcion': forms.Textarea(attrs={'rows': 1, 'placeholder': 'Describenos brevemente el problema...'})
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -28,8 +31,6 @@ class TicketUpdateForm(forms.ModelForm):
             'descripcion',
             'estado',
             'prioridad',
-            'sede',
-            'departamento',
             'activo_afectado',
             'solicitante',
             'usuario',

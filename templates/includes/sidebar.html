@@ -11,8 +11,8 @@
       <details open>
         <summary><i class="fa-solid fa-ticket"></i> Tickets</summary>
         <ul>
-          <li><a>Todos los tickets</a></li>
-          <li><a>Asignados a mí</a></li>
+          <li><a href="{% url 'tickets_view' %}">Todos los tickets</a></li>
+          <li><a href="{% url 'tickets_view_self' %}">Asignados a mí</a></li>
           <li><a>Pendientes</a></li>
         </ul>
       </details>

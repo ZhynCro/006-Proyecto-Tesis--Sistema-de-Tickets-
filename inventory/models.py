@@ -51,4 +51,4 @@ class activos(models.Model):
     verbose_name_plural = "activos"
 
     def __str__(self):
-        return f"{self.codigo} - {self.marca} {self.modelo}"
+        return f"{self.marca} {self.modelo}"
