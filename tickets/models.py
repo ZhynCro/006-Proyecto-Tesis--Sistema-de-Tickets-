@@ -19,30 +19,32 @@ class tickets(models.Model):
         to_field='prioridad',
         db_column='prioridad',
         related_name='tickets',
-        default='N/A'
+        default='N/A',
     )
-    estado = models.CharField(max_length=30)
+    estado = models.CharField(max_length=30, default='Pendiente')
     solicitante = models.ForeignKey(
         'users.usuario',
         on_delete=models.PROTECT,
         to_field='ID_empleado',
         db_column='solicitante',
-        related_name='tickets_solicitados'
+        related_name='tickets_solicitados',
     )
     usuario = models.ForeignKey(
         'users.usuario',
         on_delete=models.PROTECT,
         to_field='ID_empleado',
         db_column='usuario',
-        related_name='tickets_asignados'
+        related_name='tickets_asignados',
+        null=True,
+        blank=True,
     )
     activo_afectado = models.ForeignKey(
-        "inventory.activos",
+        'inventory.activos',
         on_delete=models.CASCADE,
         to_field='codigo',
         db_column='activo_afectado',
         related_name='tickets_afectados',
-        limit_choices_to={'estado': 'activo'}
+        limit_choices_to={'estado': 'activo'},
 )
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_resolucion = models.DateTimeField(null=True, blank=True)
@@ -65,7 +67,7 @@ class tickets_comentarios(models.Model):
         blank=True,
         to_field='ID_empleado',
         db_column='autor',
-        related_name='comentarios_autor'
+        related_name='comentarios_autor',
     )
     mensaje = models.TextField()
     archivo_adjunto = models.FileField(upload_to='tickets_adjuntos/', null=True, blank=True)
@@ -78,15 +80,15 @@ class tickets_historial(models.Model):
         on_delete=models.CASCADE,
         db_column='ticket_id',
         to_field='codigo_ticket',
-        related_name='historial'
+        related_name='historial',
     )
     estado_anterior = models.CharField(max_length=30)
     estado_nuevo = models.CharField(max_length=30)
     fecha_cambio = models.DateTimeField(auto_now_add=True)
     responsable = models.ForeignKey(
-        "users.usuario",
+        'users.usuario',
         on_delete=models.CASCADE,
-        verbose_name="Responsable del cambio",
+        verbose_name='Responsable del cambio',
         to_field='ID_empleado',
-        db_column='responsable'
+        db_column='responsable',
     )

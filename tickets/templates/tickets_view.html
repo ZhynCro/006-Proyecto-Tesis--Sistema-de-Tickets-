@@ -22,7 +22,7 @@
         </div>
     {% endif %}
 
-    <form method="post" action="{% url 'inventory_delete' %}" class="space-y-4">
+    <form method="post" action="{% url 'tickets_delete' %}" class="space-y-4">
         {% csrf_token %}
         <div class="flex justify-end">
             <button type="submit" id="delete-button" class="btn btn-error btn-sm hidden">Borrar seleccionados</button>
@@ -33,14 +33,14 @@
                 <thead>
                     <tr>
                         <th><input type="checkbox" id="select-all" class="checkbox checkbox-sm" /></th>
-                        <th>Titulo</th>
+                        <th>Título</th>
                         <th>Estado</th>
-                        <th>Creado:</th>
-                        <th>Actualizado:</th>
+                        <th>Creado</th>
+                        <th>Actualizado</th>
                         <th>Activo afectado</th>
                         <th>Prioridad</th>
                         <th>Solicitante</th>
-                        <th>Asignado a:</th>
+                        <th>Asignado a</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
@@ -56,15 +56,15 @@
                             <td>{{ ticket.fecha_resolucion|default:'Sin actualizar' }}</td>
                             <td>{{ ticket.activo_afectado }}</td>
                             <td>{{ ticket.prioridad }}</td>
+                            <td>{{ ticket.solicitante }}</td>
                             <td>{{ ticket.usuario|default:'Sin asignar' }}</td>
-
                             <td>
                                 <a href="{% url 'tickets_edit' ticket.id %}" class="btn btn-ghost btn-xs">Editar</a>
                             </td>
                         </tr>
                     {% empty %}
                         <tr>
-                            <td colspan="11" class="text-center text-gray-500 py-6">No hay tickets registrados.</td>
+                            <td colspan="10" class="text-center text-gray-500 py-6">No hay tickets registrados.</td>
                         </tr>
                     {% endfor %}
                 </tbody>

@@ -11,7 +11,7 @@ class TicketCreationForm(forms.ModelForm):
         )
         widgets = {
             'titulo': forms.TextInput(attrs={'placeholder': 'Título del ticket'}),
-            'descripcion': forms.Textarea(attrs={'rows': 1, 'placeholder': 'Describenos brevemente el problema...'})
+            'descripcion': forms.Textarea(attrs={'rows': 1, 'placeholder': 'Describenos brevemente el problema...'}),
         }
 
     def __init__(self, *args, **kwargs):
