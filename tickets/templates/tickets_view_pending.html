@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
 
-{% block title %}Tickets{% endblock %}
+{% block title %}Tickets pendientes{% endblock %}
 
 {% block content %}
 <div class="space-y-6">
     <div>
-        <h1 class="text-2xl font-bold">Mis tickets</h1>
+        <h1 class="text-2xl font-bold">Tickets pendientes</h1>
     </div>
 
     <div class="overflow-x-auto bg-base-100 rounded-lg shadow">
@@ -13,10 +13,10 @@
             <thead>
                 <tr>
                     <th>Título</th>
-                    <th>Estado</th>
+                    <th>Creado</th>
                     <th>Activo afectado</th>
-                    <th>Prioridad</th>
                     <th>Solicitante</th>
+                    <th>Asignado a</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
@@ -24,20 +24,19 @@
                 {% for ticket in tickets %}
                     <tr>
                         <td>{{ ticket.titulo }}</td>
-                        <td>{{ ticket.estado }}</td>
+                        <td>{{ ticket.fecha_creacion }}</td>
                         <td>{{ ticket.activo_afectado }}</td>
-                        <td>{{ ticket.prioridad }}</td>
                         <td>{{ ticket.solicitante }}</td>
+                        <td>{{ ticket.usuario|default:'Sin asignar' }}</td>
                         <td><a href="{% url 'tickets_edit' ticket.id %}" class="btn btn-ghost btn-xs">Editar</a></td>
                     </tr>
                 {% empty %}
                     <tr>
-                        <td colspan="6" class="text-center text-gray-500 py-6">No tienes tickets asignados.</td>
+                        <td colspan="6" class="text-center text-gray-500 py-6">No hay tickets pendientes.</td>
                     </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
 </div>
-
 {% endblock %}

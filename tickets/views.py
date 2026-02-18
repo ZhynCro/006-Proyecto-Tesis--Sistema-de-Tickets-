@@ -1,51 +1,84 @@
 from django.shortcuts import render
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect, render
-
-from inventory.models import activos
 from tickets.forms import TicketCreationForm, TicketUpdateForm
 from tickets.models import tickets
+from users.models import usuario
 
+def _get_current_usuario(request):
+    id_empleado = request.session.get('ID_empleado')
+    if id_empleado:
+        return usuario.objects.filter(ID_empleado=id_empleado, is_active=True).first()
+
+    if request.user.is_authenticated:
+        return request.user
+
+    return None
+
+def _next_ticket_code():
+    ultimo_ticket = tickets.objects.order_by('-id').first()
+    siguiente = 1 if ultimo_ticket is None else ultimo_ticket.id + 1
+    return f'TKT-{siguiente:05d}'
 
 def tickets_view(request):
-    tickets_registrados = (
-        tickets.objects.select_related('activo_afectado', 'prioridad', 'solicitante', 'usuario')
-        .filter(estado__iexact='abierto')
-        .order_by('fecha_creacion')
+    tickets_registrados = tickets.objects.select_related('activo_afectado', 'prioridad', 'solicitante', 'usuario').order_by(
+        '-fecha_creacion'
     )
     return render(request, 'tickets_view.html', {'tickets': tickets_registrados})
 
 def tickets_view_self(request):
-    tickets_asignados = (
-        tickets.objects.select_related('activo_afectado', 'prioridad', 'solicitante', 'usuario')
-        .filter(usuario=request.user, estado__iexact='abierto')
-        .order_by('fecha_creacion')
-    )
+    current_user = _get_current_usuario(request)
+    tickets_asignados = tickets.objects.none()
+    if current_user:
+        tickets_asignados = tickets.objects.select_related('activo_afectado', 'prioridad', 'solicitante', 'usuario').filter(
+            usuario=current_user
+        ).order_by('-fecha_creacion')
+
     return render(request, 'tickets_view_self.html', {'tickets': tickets_asignados})
 
+def tickets_view_pending(request):
+    tickets_pendientes = tickets.objects.select_related('activo_afectado', 'prioridad', 'solicitante', 'usuario').filter(
+        estado__iexact='pendiente'
+    ).order_by('-fecha_creacion')
+
+    return render(request, 'tickets_view_pending.html', {'tickets': tickets_pendientes})
 
 def tickets_create(request):
+    current_user = _get_current_usuario(request)
+
+    if not current_user:
+        messages.error(request, 'No se pudo identificar al solicitante del ticket.')
+        return redirect('login')
+
     if request.method == 'POST':
         form = TicketCreationForm(request.POST)
         if form.is_valid():
-            form.save()
-            messages.success(request, 'Activo creado correctamente.')
-            return redirect('ticket_view')
+            ticket = form.save(commit=False)
+            ticket.codigo_ticket = _next_ticket_code()
+            ticket.estado = 'Pendiente'
+            ticket.prioridad_id = 'N/A'
+            ticket.solicitante = current_user
+            ticket.usuario = None
+            ticket.fecha_resolucion = None
+            ticket.save()
+
+            messages.success(request, 'Ticket creado correctamente.')
+            return redirect('tickets_view')
     else:
         form = TicketCreationForm()
 
     return render(request, 'tickets_create.html', {'form': form})
 
 
-def tickets_edit(request, id):
-    ticket = get_object_or_404(tickets, pk=id)
+def tickets_edit(request, ticket_id):
+    ticket = get_object_or_404(tickets, pk=ticket_id)
 
     if request.method == 'POST':
         form = TicketUpdateForm(request.POST, instance=ticket)
         if form.is_valid():
             form.save()
             messages.success(request, 'Ticket actualizado correctamente.')
-            return redirect('ticket_view')
+            return redirect('tickets_view')
     else:
         form = TicketUpdateForm(instance=ticket)
 
@@ -54,19 +87,19 @@ def tickets_edit(request, id):
 
 def tickets_delete(request):
     if request.method != 'POST':
-        return redirect('ticket_view')
+        return redirect('tickets_view')
 
     tickets_seleccionados = request.POST.getlist('tickets_seleccionados')
 
     if not tickets_seleccionados:
         messages.error(request, 'No se seleccionó ningún ticket para eliminar.')
-        return redirect('ticket_view')
+        return redirect('tickets_view')
 
-    borrar_tickets = tickets.objects.filter(id__in=tickets_seleccionados).delete()
+    borrar_tickets, _ = tickets.objects.filter(id__in=tickets_seleccionados).delete()
 
     if borrar_tickets > 0:
         messages.success(request, 'Tickets borrados correctamente.')
     else:
         messages.error(request, 'No se encontraron tickets para borrar.')
 
-    return redirect('ticket_view')
+    return redirect('tickets_view')
