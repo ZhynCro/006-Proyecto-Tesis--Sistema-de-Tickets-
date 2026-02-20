@@ -6,7 +6,7 @@ class matriz_prioridad(models.Model):
     tiempo_resolucion_minutos = models.IntegerField()
 
     def __str__(self):
-        return f"{self.prioridad} (Respuesta: {self.tiempo_respuesta_minutos}m, Resolución: {self.tiempo_resolucion_minutos}m)"
+        return f"{self.prioridad}"
 
 
 class tickets(models.Model):
@@ -21,7 +21,14 @@ class tickets(models.Model):
         related_name='tickets',
         default='N/A',
     )
-    estado = models.CharField(max_length=30, default='Pendiente')
+
+    ESTADO_TYPES = [
+        ('Pendiente', 'Pendiente'),
+        ('En Progreso', 'En Progreso'),
+        ('Resuelto', 'Resuelto'),
+        ('Cerrado', 'Cerrado'),
+    ]
+    estado = models.CharField(max_length=30, default='Pendiente', choices=ESTADO_TYPES)
     solicitante = models.ForeignKey(
         'users.usuario',
         on_delete=models.PROTECT,

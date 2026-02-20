@@ -4,6 +4,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from tickets.forms import TicketCreationForm, TicketUpdateForm
 from tickets.models import tickets
 from users.models import usuario
+from django.utils import timezone
 
 def _get_current_usuario(request):
     id_empleado = request.session.get('ID_empleado')
@@ -28,6 +29,7 @@ def tickets_view(request):
 
 def tickets_view_self(request):
     current_user = _get_current_usuario(request)
+    print(f"Usuario actual: {current_user}")
     tickets_asignados = tickets.objects.none()
     if current_user:
         tickets_asignados = tickets.objects.select_related('activo_afectado', 'prioridad', 'solicitante', 'usuario').filter(
@@ -75,8 +77,18 @@ def tickets_edit(request, ticket_id):
 
     if request.method == 'POST':
         form = TicketUpdateForm(request.POST, instance=ticket)
+        ticket_actual = tickets.objects.get(pk=ticket_id)
         if form.is_valid():
-            form.save()
+            ticket = form.save(commit=False)
+
+            if form.cleaned_data['estado'] != ticket_actual.estado:
+                print(f"Estado cambiado de {ticket_actual.estado} a {form.cleaned_data['estado']}")
+                ticket.fecha_resolucion = timezone.now()
+            elif form.cleaned_data['estado'] == ticket_actual.estado:
+                print(f"Estado sin cambios: {ticket_actual.estado}")
+                ticket.fecha_resolucion = None
+
+            ticket.save()
             messages.success(request, 'Ticket actualizado correctamente.')
             return redirect('tickets_view')
     else:
