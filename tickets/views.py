@@ -29,11 +29,10 @@ def tickets_view(request):
 
 def tickets_view_self(request):
     current_user = _get_current_usuario(request)
-    print(f"Usuario actual: {current_user}")
     tickets_asignados = tickets.objects.none()
     if current_user:
         tickets_asignados = tickets.objects.select_related('activo_afectado', 'prioridad', 'solicitante', 'usuario').filter(
-            usuario=current_user
+            usuario=current_user, estado__iexact='pendiente'
         ).order_by('-fecha_creacion')
 
     return render(request, 'tickets_view_self.html', {'tickets': tickets_asignados})
@@ -84,9 +83,6 @@ def tickets_edit(request, ticket_id):
             if form.cleaned_data['estado'] != ticket_actual.estado:
                 print(f"Estado cambiado de {ticket_actual.estado} a {form.cleaned_data['estado']}")
                 ticket.fecha_resolucion = timezone.now()
-            elif form.cleaned_data['estado'] == ticket_actual.estado:
-                print(f"Estado sin cambios: {ticket_actual.estado}")
-                ticket.fecha_resolucion = None
 
             ticket.save()
             messages.success(request, 'Ticket actualizado correctamente.')
