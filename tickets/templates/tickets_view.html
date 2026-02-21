@@ -12,6 +12,51 @@
         <a href="{% url 'tickets_create' %}" class="btn btn-primary btn-sm">Crear ticket</a>
     </div>
 
+    
+    <form method="get" class="flex flex-nowrap items-end gap-4 overflow-x-auto rounded-lg bg-base-100 p-4 shadow">
+        <div class="form-control min-w-55 flex-1">
+            <label class="label" for="estado">
+                <span class="label-text">Estado</span>
+            </label>
+            <select id="estado" name="estado" class="select select-bordered select-sm w-full">
+                <option value="">Todos</option>
+                {% for valor, nombre in estados %}
+                    <option value="{{ valor }}" {% if filtros.estado == valor %}selected{% endif %}>{{ nombre }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-control min-w-55 flex-1">
+            <label class="label" for="usuario_asignado">
+                <span class="label-text">Usuario asignado</span>
+            </label>
+            <select id="usuario_asignado" name="usuario_asignado" class="select select-bordered select-sm w-full">
+                <option value="">Todos</option>
+                {% for usuario in usuarios_asignados %}
+                    <option value="{{ usuario.ID_empleado }}" {% if filtros.usuario_asignado == usuario.ID_empleado %}selected{% endif %}>{{ usuario }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-control min-w-55 flex-1">
+            <label class="label" for="prioridad">
+                <span class="label-text">Prioridad</span>
+            </label>
+            <select id="prioridad" name="prioridad" class="select select-bordered select-sm w-full">
+                <option value="">Todas</option>
+                {% for prioridad_item in prioridades %}
+                    <option value="{{ prioridad_item.prioridad }}" {% if filtros.prioridad == prioridad_item.prioridad %}selected{% endif %}>{{ prioridad_item.prioridad }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="flex min-w-55 flex-1 items-end gap-2 justify-center">
+            <button type="submit" class="btn btn-primary btn-lg">Filtrar</button>
+            <a href="{% url 'tickets_view' %}" class="btn btn-ghost btn-lg">Limpiar</a>
+        </div>
+    </form>
+
+
     {% if messages %}
         <div class="space-y-2">
             {% for message in messages %}

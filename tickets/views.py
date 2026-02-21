@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect, render
 from tickets.forms import TicketCreationForm, TicketUpdateForm
-from tickets.models import tickets
+from tickets.models import tickets, matriz_prioridad
 from users.models import usuario
 from django.utils import timezone
 
@@ -25,7 +25,39 @@ def tickets_view(request):
     tickets_registrados = tickets.objects.select_related('activo_afectado', 'prioridad', 'solicitante', 'usuario').order_by(
         '-fecha_creacion'
     )
-    return render(request, 'tickets_view.html', {'tickets': tickets_registrados})
+
+    # filtros enviados desde el formulario
+    estado = request.GET.get('estado', '').strip()
+    usuario_asignado = request.GET.get('usuario_asignado', '').strip()
+    prioridad = request.GET.get('prioridad', '').strip()
+
+    # aplicar filtros a la consulta
+    if estado:
+        tickets_registrados = tickets_registrados.filter(estado=estado)
+
+    if usuario_asignado:
+        tickets_registrados = tickets_registrados.filter(usuario_id=usuario_asignado)
+
+    if prioridad:
+        tickets_registrados = tickets_registrados.filter(prioridad_id=prioridad)
+
+    # mantiene esos filtros seleccionados en el formulario
+    filtros = {
+        'estado': estado,
+        'usuario_asignado': usuario_asignado,
+        'prioridad': prioridad,
+    }
+
+    # prepara el contexto completo para la plantilla, incluyendo los tickets filtrados y las opciones para los filtros
+    contexto = {
+        'tickets': tickets_registrados,
+        'estados': tickets.ESTADO_TYPES,
+        'usuarios_asignados': usuario.objects.filter(is_active=True).order_by('first_name', 'last_name', 'ID_empleado'),
+        'prioridades': matriz_prioridad.objects.order_by('prioridad'),
+        'filtros': filtros,
+    }
+
+    return render(request, 'tickets_view.html', contexto)
 
 def tickets_view_self(request):
     current_user = _get_current_usuario(request)
