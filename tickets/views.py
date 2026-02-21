@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect, render
 from tickets.forms import TicketCreationForm, TicketUpdateForm
-from tickets.models import tickets, matriz_prioridad
+from tickets.models import tickets, matriz_prioridad, tickets_historial
 from users.models import usuario
 from django.utils import timezone
 
@@ -20,6 +20,18 @@ def _next_ticket_code():
     ultimo_ticket = tickets.objects.order_by('-id').first()
     siguiente = 1 if ultimo_ticket is None else ultimo_ticket.id + 1
     return f'TKT-{siguiente:05d}'
+
+def _save_historial_ticket(ticket_id, form, request):
+    ticket_actual = tickets.objects.get(pk=ticket_id)
+    historial = tickets_historial(
+        estado_anterior=ticket_actual.estado,
+        estado_nuevo=form.cleaned_data['estado'],
+        fecha_cambio=form.cleaned_data.get('fecha_resolucion') or timezone.now(),
+        responsable=_get_current_usuario(request),
+        ticket_id=ticket_actual,
+    )
+    historial.save()
+    return None
 
 def tickets_view(request):
     tickets_registrados = tickets.objects.select_related('activo_afectado', 'prioridad', 'solicitante', 'usuario').order_by(
@@ -104,6 +116,7 @@ def tickets_create(request):
 
 
 def tickets_edit(request, ticket_id):
+    print(f"Intentando editar el ticket con ID: {ticket_id}")
     ticket = get_object_or_404(tickets, pk=ticket_id)
 
     if request.method == 'POST':
@@ -115,7 +128,7 @@ def tickets_edit(request, ticket_id):
             if form.cleaned_data['estado'] != ticket_actual.estado:
                 print(f"Estado cambiado de {ticket_actual.estado} a {form.cleaned_data['estado']}")
                 ticket.fecha_resolucion = timezone.now()
-
+                _save_historial_ticket(ticket_id, form, request)
             ticket.save()
             messages.success(request, 'Ticket actualizado correctamente.')
             return redirect('tickets_view')
@@ -123,7 +136,6 @@ def tickets_edit(request, ticket_id):
         form = TicketUpdateForm(instance=ticket)
 
     return render(request, 'tickets_edit.html', {'form': form, 'ticket': ticket})
-
 
 def tickets_delete(request):
     if request.method != 'POST':

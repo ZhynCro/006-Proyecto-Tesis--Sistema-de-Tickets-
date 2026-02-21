@@ -61,7 +61,7 @@ class tickets(models.Model):
 
 
 class tickets_comentarios(models.Model):
-    ticket_id = models.ForeignKey(
+    ticket = models.ForeignKey(
         tickets,
         on_delete=models.CASCADE,
 
