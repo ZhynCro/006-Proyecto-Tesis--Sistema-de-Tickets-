@@ -1,7 +1,7 @@
 <aside class="bg-base-100 w-64 min-h-screen border-r border-base-300 hidden lg:block">
   <div class="p-4 mb-4">
     <span class="text-xl font-bold text-primary flex items-center gap-2">
-      <i class="fa-solid fa-ticket-simple"></i> Prueba
+      <i class="fa-solid fa-ticket-simple"></i> ETR Tickets
     </span>
   </div>
   <ul class="menu w-full px-4 gap-2">
@@ -13,7 +13,7 @@
         <ul>
           <li><a href="{% url 'tickets_view' %}">Todos los tickets</a></li>
           <li><a href="{% url 'tickets_view_self' %}">Asignados a mí</a></li>
-          <li><a>Pendientes</a></li>
+          <li><a href="{% url 'tickets_view_pending' %}">Pendientes</a></li>
         </ul>
       </details>
     </li>

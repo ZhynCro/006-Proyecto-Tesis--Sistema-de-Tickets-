@@ -1,9 +1,11 @@
 from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect, render
 from tickets.forms import TicketCreationForm, TicketUpdateForm
-from tickets.models import tickets
+from tickets.models import tickets, matriz_prioridad, tickets_historial
 from users.models import usuario
+from django.utils import timezone
 
 def _get_current_usuario(request):
     id_empleado = request.session.get('ID_empleado')
@@ -20,22 +22,69 @@ def _next_ticket_code():
     siguiente = 1 if ultimo_ticket is None else ultimo_ticket.id + 1
     return f'TKT-{siguiente:05d}'
 
+def _save_historial_ticket(ticket_id, form, request):
+    ticket_actual = tickets.objects.get(pk=ticket_id)
+    historial = tickets_historial(
+        estado_anterior=ticket_actual.estado,
+        estado_nuevo=form.cleaned_data['estado'],
+        fecha_cambio=form.cleaned_data.get('fecha_resolucion') or timezone.now(),
+        responsable=_get_current_usuario(request),
+        ticket_id=ticket_actual,
+    )
+    historial.save()
+    return None
+
+@login_required
 def tickets_view(request):
     tickets_registrados = tickets.objects.select_related('activo_afectado', 'prioridad', 'solicitante', 'usuario').order_by(
         '-fecha_creacion'
     )
-    return render(request, 'tickets_view.html', {'tickets': tickets_registrados})
 
+    # filtros enviados desde el formulario
+    estado = request.GET.get('estado', '').strip()
+    usuario_asignado = request.GET.get('usuario_asignado', '').strip()
+    prioridad = request.GET.get('prioridad', '').strip()
+
+    # aplicar filtros a la consulta
+    if estado:
+        tickets_registrados = tickets_registrados.filter(estado=estado)
+
+    if usuario_asignado:
+        tickets_registrados = tickets_registrados.filter(usuario_id=usuario_asignado)
+
+    if prioridad:
+        tickets_registrados = tickets_registrados.filter(prioridad_id=prioridad)
+
+    # mantiene esos filtros seleccionados en el formulario
+    filtros = {
+        'estado': estado,
+        'usuario_asignado': usuario_asignado,
+        'prioridad': prioridad,
+    }
+
+    # prepara el contexto completo para la plantilla, incluyendo los tickets filtrados y las opciones para los filtros
+    contexto = {
+        'tickets': tickets_registrados,
+        'estados': tickets.ESTADO_TYPES,
+        'usuarios_asignados': usuario.objects.filter(is_active=True).order_by('first_name', 'last_name', 'ID_empleado'),
+        'prioridades': matriz_prioridad.objects.order_by('prioridad'),
+        'filtros': filtros,
+    }
+
+    return render(request, 'tickets_view.html', contexto)
+
+@login_required
 def tickets_view_self(request):
     current_user = _get_current_usuario(request)
     tickets_asignados = tickets.objects.none()
     if current_user:
         tickets_asignados = tickets.objects.select_related('activo_afectado', 'prioridad', 'solicitante', 'usuario').filter(
-            usuario=current_user
+            usuario=current_user, estado__iexact='pendiente'
         ).order_by('-fecha_creacion')
 
     return render(request, 'tickets_view_self.html', {'tickets': tickets_asignados})
 
+@login_required
 def tickets_view_pending(request):
     tickets_pendientes = tickets.objects.select_related('activo_afectado', 'prioridad', 'solicitante', 'usuario').filter(
         estado__iexact='pendiente'
@@ -43,6 +92,7 @@ def tickets_view_pending(request):
 
     return render(request, 'tickets_view_pending.html', {'tickets': tickets_pendientes})
 
+@login_required
 def tickets_create(request):
     current_user = _get_current_usuario(request)
 
@@ -69,14 +119,22 @@ def tickets_create(request):
 
     return render(request, 'tickets_create.html', {'form': form})
 
-
+@login_required
 def tickets_edit(request, ticket_id):
+    print(f"Intentando editar el ticket con ID: {ticket_id}")
     ticket = get_object_or_404(tickets, pk=ticket_id)
 
     if request.method == 'POST':
         form = TicketUpdateForm(request.POST, instance=ticket)
+        ticket_actual = tickets.objects.get(pk=ticket_id)
         if form.is_valid():
-            form.save()
+            ticket = form.save(commit=False)
+
+            if form.cleaned_data['estado'] != ticket_actual.estado:
+                print(f"Estado cambiado de {ticket_actual.estado} a {form.cleaned_data['estado']}")
+                ticket.fecha_resolucion = timezone.now()
+                _save_historial_ticket(ticket_id, form, request)
+            ticket.save()
             messages.success(request, 'Ticket actualizado correctamente.')
             return redirect('tickets_view')
     else:
@@ -84,7 +142,7 @@ def tickets_edit(request, ticket_id):
 
     return render(request, 'tickets_edit.html', {'form': form, 'ticket': ticket})
 
-
+@login_required
 def tickets_delete(request):
     if request.method != 'POST':
         return redirect('tickets_view')
