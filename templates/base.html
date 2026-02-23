@@ -9,10 +9,13 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body class="bg-base-200 min-h-screen flex flex-col">
-
-    {% include 'includes/navbar.html' %}
+    
+    {% if request.user.is_authenticated %}
+        {% include 'includes/navbar.html' %}
+    {% endif %}
 
     <div class="flex flex-1">
+
         {% include 'includes/sidebar.html' %}
 
         <main class="flex-1 p-6">

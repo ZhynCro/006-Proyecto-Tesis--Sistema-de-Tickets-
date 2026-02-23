@@ -92,7 +92,6 @@ def tickets_view_pending(request):
 
     return render(request, 'tickets_view_pending.html', {'tickets': tickets_pendientes})
 
-@login_required
 def tickets_create(request):
     current_user = _get_current_usuario(request)
 
