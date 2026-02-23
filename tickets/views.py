@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect, render
 from tickets.forms import TicketCreationForm, TicketUpdateForm
@@ -33,6 +34,7 @@ def _save_historial_ticket(ticket_id, form, request):
     historial.save()
     return None
 
+@login_required
 def tickets_view(request):
     tickets_registrados = tickets.objects.select_related('activo_afectado', 'prioridad', 'solicitante', 'usuario').order_by(
         '-fecha_creacion'
@@ -71,6 +73,7 @@ def tickets_view(request):
 
     return render(request, 'tickets_view.html', contexto)
 
+@login_required
 def tickets_view_self(request):
     current_user = _get_current_usuario(request)
     tickets_asignados = tickets.objects.none()
@@ -81,6 +84,7 @@ def tickets_view_self(request):
 
     return render(request, 'tickets_view_self.html', {'tickets': tickets_asignados})
 
+@login_required
 def tickets_view_pending(request):
     tickets_pendientes = tickets.objects.select_related('activo_afectado', 'prioridad', 'solicitante', 'usuario').filter(
         estado__iexact='pendiente'
@@ -88,6 +92,7 @@ def tickets_view_pending(request):
 
     return render(request, 'tickets_view_pending.html', {'tickets': tickets_pendientes})
 
+@login_required
 def tickets_create(request):
     current_user = _get_current_usuario(request)
 
@@ -114,7 +119,7 @@ def tickets_create(request):
 
     return render(request, 'tickets_create.html', {'form': form})
 
-
+@login_required
 def tickets_edit(request, ticket_id):
     print(f"Intentando editar el ticket con ID: {ticket_id}")
     ticket = get_object_or_404(tickets, pk=ticket_id)
@@ -137,6 +142,7 @@ def tickets_edit(request, ticket_id):
 
     return render(request, 'tickets_edit.html', {'form': form, 'ticket': ticket})
 
+@login_required
 def tickets_delete(request):
     if request.method != 'POST':
         return redirect('tickets_view')

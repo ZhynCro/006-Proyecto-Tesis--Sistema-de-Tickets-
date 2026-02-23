@@ -1,6 +1,7 @@
 from django.contrib import messages
-from django.contrib.auth import authenticate, login, get_user_model
+from django.contrib.auth import authenticate, login, get_user_model, logout
 from django.shortcuts import redirect, render, get_object_or_404
+from django.contrib.auth.decorators import login_required
 
 from users.forms import UsuarioCreationForm, UsuarioUpdateForm
 from .models import usuario
@@ -12,12 +13,16 @@ def index(request):
         return redirect('user_view') # Nombre de tu ruta de inicio
     return redirect('login')
 
+@login_required
 def logout_view(request):
     try:
         del request.session['ID_empleado']
     except KeyError:
         pass
+    
+    logout(request)
     return redirect('login')
+
 
 def login_view(request):
     if request.method == 'POST':
@@ -54,6 +59,7 @@ def admin_login_view(request):
 
     return render(request, 'login_admin.html')
 
+@login_required
 def user_create (request):
     if request.method == 'POST':
         form = UsuarioCreationForm(request.POST)
@@ -66,11 +72,13 @@ def user_create (request):
 
     return render(request, 'user_create.html', {'form': form})
 
+@login_required
 def user_view(request):
     user_model = get_user_model()
     usuarios = user_model.objects.select_related('departamento', 'sede').filter(is_active=True).order_by('ID_empleado')
     return render(request, 'user_view.html', {'usuarios': usuarios})
 
+@login_required
 def user_edit(request, user_id):
     user_model = get_user_model()
     usuario = get_object_or_404(user_model, pk=user_id)
@@ -86,6 +94,7 @@ def user_edit(request, user_id):
 
         return render(request, 'user_edit.html', {'form': form, 'usuario': usuario})
 
+@login_required
 def user_delete(request):
     if request.method != 'POST':
         return redirect('user_view')
