@@ -20,6 +20,7 @@ def logout_view(request):
     except KeyError:
         pass
     
+    request.session.pop('admin_login', None)
     logout(request)
     return redirect('login')
 
@@ -34,7 +35,7 @@ def login_view(request):
 
         if usuario.objects.filter(ID_empleado=id_empleado).exists():
             request.session['ID_empleado'] = id_empleado
-            #messages.success(request, 'ID de empleado registrado correctamente.')
+            request.session['admin_login'] = False
             return redirect('tickets_create')
         else:
             messages.error(request, 'ID de empleado no encontrado. Verifique la información ingresada.')
@@ -54,7 +55,7 @@ def admin_login_view(request):
             return render(request, 'login_admin.html')
 
         login(request, user)
-        #messages.success(request, 'Inicio de sesión administrativo exitoso.')
+        request.session['admin_login'] = True
         return redirect('user_view')
 
     return render(request, 'login_admin.html')
