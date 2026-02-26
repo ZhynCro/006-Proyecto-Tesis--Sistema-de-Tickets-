@@ -22,6 +22,7 @@ urlpatterns = [
     path('users/', include('users.urls')),
     path('inventory/', include('inventory.urls')),
     path('tickets/', include('tickets.urls')),
+    path('library/', include('library.urls')),
     path("__reload__/", include("django_browser_reload.urls")),
     path('', include('dashboard.urls')),
 ]

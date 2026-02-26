@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block title %}Biblioteca{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+            <h1 class="text-2xl font-bold">Biblioteca</h1>
+            <p class="text-sm text-gray-500">Tutoriales y documentos cargados</p>
+        </div>
+        <a href="{% url 'library_create' %}" class="btn btn-primary btn-sm">Subir documento</a>
+    </div>
+
+    {% if messages %}
+        <div class="space-y-2">
+            {% for message in messages %}
+                <div class="alert {% if message.tags == 'error' %}alert-error{% else %}alert-success{% endif %}">
+                    <span>{{ message }}</span>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <form method="post" action="{% url 'library_delete' %}" class="space-y-4">
+        {% csrf_token %}
+        <div class="flex justify-end">
+            <button type="submit" id="delete-button" class="btn btn-error btn-sm hidden">Eliminar seleccionados</button>
+        </div>
+
+        <div class="overflow-x-auto bg-base-100 rounded-lg shadow">
+            <table class="table w-full">
+                <thead>
+                    <tr>
+                        <th><input type="checkbox" id="select-all" class="checkbox checkbox-sm" /></th>
+                        <th>Título</th>
+                        <th>Archivo original</th>
+                        <th>Extensión</th>
+                        <th>MIME</th>
+                        <th>Tamaño (bytes)</th>
+                        <th>Ruta</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for tutorial in tutoriales %}
+                        <tr>
+                            <td><input type="checkbox" name="tutoriales_seleccionados" value="{{ tutorial.id }}" class="checkbox checkbox-sm row-checkbox" /></td>
+                            <td>{{ tutorial.titulo }}</td>
+                            <td>{{ tutorial.nombre_original }}</td>
+                            <td>{{ tutorial.extension }}</td>
+                            <td>{{ tutorial.mime_type }}</td>
+                            <td>{{ tutorial.tamano_bytes }}</td>
+                            <td class="text-xs">{{ tutorial.archivo_path }}</td>
+                            <td class="space-x-1">
+                                <a href="{% url 'library_download' tutorial.id %}" class="btn btn-ghost btn-xs">Descargar</a>
+                                <a href="{% url 'library_edit' tutorial.id %}" class="btn btn-ghost btn-xs">Editar</a>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="8" class="text-center text-gray-500 py-6">No hay documentos registrados.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </form>
+</div>
+
+<script>
+    const deleteButton = document.getElementById('delete-button');
+    const checkboxes = document.querySelectorAll('.row-checkbox');
+    const selectAll = document.getElementById('select-all');
+
+    const updateDeleteButton = () => {
+        const anyChecked = Array.from(checkboxes).some((checkbox) => checkbox.checked);
+        deleteButton.classList.toggle('hidden', !anyChecked);
+    };
+
+    checkboxes.forEach((checkbox) => {
+        checkbox.addEventListener('change', updateDeleteButton);
+    });
+
+    if (selectAll) {
+        selectAll.addEventListener('change', (event) => {
+            checkboxes.forEach((checkbox) => {
+                checkbox.checked = event.target.checked;
+            });
+            updateDeleteButton();
+        });
+    }
+</script>
+{% endblock %}

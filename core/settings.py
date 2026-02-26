@@ -135,6 +135,14 @@ LOGIN_URL = 'login'
 
 AUTH_USER_MODEL = 'users.usuario'
 
+SESSION_COOKIE_AGE = 60 * 60 * 24  # La sesión dura exactamente 1 hora
+
 TAILWIND_APP_NAME = 'theme'
 
 NPM_BIN_PATH = r"C:\nvm4w\nodejs\npm.cmd"
+
+# Configuración para archivos multimedia
+
+MEDIA_URL = 'media/'
+
+MEDIA_ROOT = BASE_DIR / 'media'
