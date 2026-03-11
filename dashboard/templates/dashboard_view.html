@@ -3,5 +3,135 @@
 {% block title %}Dashboard{% endblock %}
 
 {% block content %}
-    <h1 class="text-2xl font-bold">Dashboard</h1>
+<div class="space-y-6">
+    <div class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+            <h1 class="text-2xl font-bold">Dashboard operativo</h1>
+            <p class="text-sm text-gray-500">Resumen de tickets, inventario y documentación.</p>
+        </div>
+        <div class="flex gap-2">
+            <a href="{% url 'tickets_create' %}" class="btn btn-primary btn-sm">Crear ticket</a>
+            <a href="{% url 'tickets_view_pending' %}" class="btn btn-outline btn-sm">Ver pendientes</a>
+        </div>
+    </div>
+
+    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div class="card bg-base-100 shadow-sm">
+            <div class="card-body py-4">
+                <p class="text-sm text-gray-500">Tickets totales</p>
+                <p class="text-3xl font-semibold">{{ kpis.tickets_totales }}</p>
+            </div>
+        </div>
+        <div class="card bg-base-100 shadow-sm">
+            <div class="card-body py-4">
+                <p class="text-sm text-gray-500">Tickets abiertos</p>
+                <p class="text-3xl font-semibold text-warning">{{ kpis.tickets_abiertos }}</p>
+            </div>
+        </div>
+        <div class="card bg-base-100 shadow-sm">
+            <div class="card-body py-4">
+                <p class="text-sm text-gray-500">Resueltos</p>
+                <p class="text-3xl font-semibold text-success">{{ kpis.tickets_resueltos }}</p>
+            </div>
+        </div>
+        <div class="card bg-base-100 shadow-sm">
+            <div class="card-body py-4">
+                <p class="text-sm text-gray-500">Sin asignar</p>
+                <p class="text-3xl font-semibold text-error">{{ kpis.tickets_sin_asignar }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid gap-4 lg:grid-cols-3">
+        <div class="card bg-base-100 shadow-sm lg:col-span-2">
+            <div class="card-body">
+                <h2 class="card-title text-lg">Distribución por estado</h2>
+                <div class="overflow-x-auto">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Estado</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for estado, total in estado_totales.items %}
+                            <tr>
+                                <td>{{ estado }}</td>
+                                <td>{{ total }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="2" class="text-center text-gray-500">Sin tickets registrados.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="card bg-base-100 shadow-sm">
+            <div class="card-body">
+                <h2 class="card-title text-lg">Inventario y docs</h2>
+                <ul class="space-y-2 text-sm">
+                    <li class="flex justify-between"><span>Activos totales</span><span class="font-semibold">{{ kpis.activos_totales }}</span></li>
+                    <li class="flex justify-between"><span>Activos asignados</span><span class="font-semibold">{{ kpis.activos_asignados }}</span></li>
+                    <li class="flex justify-between"><span>Documentos cargados</span><span class="font-semibold">{{ kpis.documentos_totales }}</span></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid gap-4 lg:grid-cols-2">
+        <div class="card bg-base-100 shadow-sm">
+            <div class="card-body">
+                <div class="flex items-center justify-between">
+                    <h2 class="card-title text-lg">Tickets recientes</h2>
+                    <a href="{% url 'tickets_view' %}" class="link link-primary text-sm">Ver todos</a>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Estado</th>
+                                <th>Prioridad</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for ticket in tickets_recientes %}
+                            <tr>
+                                <td>{{ ticket.codigo_ticket }}</td>
+                                <td>{{ ticket.estado }}</td>
+                                <td>{{ ticket.prioridad_id }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="3" class="text-center text-gray-500">No hay tickets recientes.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="card bg-base-100 shadow-sm">
+            <div class="card-body">
+                <h2 class="card-title text-lg">Mis tickets activos</h2>
+                <ul class="space-y-2">
+                    {% for ticket in mis_tickets %}
+                    <li class="rounded-lg border border-base-300 p-3 text-sm">
+                        <p class="font-medium">{{ ticket.codigo_ticket }} · {{ ticket.titulo }}</p>
+                        <p class="text-gray-500">{{ ticket.estado }} · {{ ticket.prioridad_id }}</p>
+                    </li>
+                    {% empty %}
+                    <li class="text-sm text-gray-500">No tienes tickets asignados activos.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
