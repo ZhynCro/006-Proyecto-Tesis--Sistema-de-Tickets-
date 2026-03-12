@@ -18,31 +18,31 @@ def get_current_usuario(request):
 
 
 def build_dashboard_context(request):
-    tickets_qs = tickets.objects.select_related('prioridad', 'usuario', 'solicitante', 'activo_afectado')
+    tickets_all = tickets.objects.select_related('prioridad', 'usuario', 'solicitante', 'activo_afectado')
 
     estado_totales = {
         row['estado']: row['total']
-        for row in tickets_qs.values('estado').annotate(total=Count('id'))
+        for row in tickets_all.values('estado').annotate(total=Count('id'))
     }
 
     prioridades_totales = list(
-        tickets_qs.values('prioridad_id').annotate(total=Count('id')).order_by('-total')
+        tickets_all.values('prioridad_id').annotate(total=Count('id')).order_by('-total')
     )
 
     current_user = get_current_usuario(request)
     mis_tickets = tickets.objects.none()
     if current_user:
         mis_tickets = (
-            tickets_qs.filter(usuario=current_user)
+            tickets_all.filter(usuario=current_user)
             .exclude(estado='Cerrado')
             .order_by('-fecha_creacion')[:5]
         )
 
     kpis = {
-        'tickets_totales': tickets_qs.count(),
-        'tickets_abiertos': tickets_qs.filter(estado__in=['Pendiente', 'En Progreso']).count(),
-        'tickets_resueltos': tickets_qs.filter(estado='Resuelto').count(),
-        'tickets_sin_asignar': tickets_qs.filter(estado='Pendiente', usuario__isnull=True).count(),
+        'tickets_totales': tickets_all.count(),
+        'tickets_abiertos': tickets_all.filter(estado__in=['Pendiente', 'En Progreso']).count(),
+        'tickets_resueltos': tickets_all.filter(estado='Resuelto').count(),
+        'tickets_sin_asignar': tickets_all.filter(estado='Pendiente', usuario__isnull=True).count(),
         'activos_totales': activos.objects.count(),
         'activos_asignados': activos.objects.filter(usuario_asignado__isnull=False).count(),
         'documentos_totales': Tutorial.objects.count(),
@@ -52,9 +52,9 @@ def build_dashboard_context(request):
         'kpis': kpis,
         'estado_totales': estado_totales,
         'prioridades_totales': prioridades_totales,
-        'tickets_recientes': tickets_qs.order_by('-fecha_creacion')[:5],
+        'tickets_recientes': tickets_all.order_by('-fecha_creacion')[:5],
         'mis_tickets': mis_tickets,
-        'tickets_criticos': tickets_qs.filter(
+        'tickets_criticos': tickets_all.filter(
             Q(prioridad_id='Alta') | Q(prioridad_id='Crítica'),
             estado='Pendiente',
         ).order_by('-fecha_creacion')[:5],
