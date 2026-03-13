@@ -6,8 +6,8 @@
 <div class="space-y-6">
     <div class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div>
-            <h1 class="text-2xl font-bold">Dashboard operativo</h1>
-            <p class="text-sm text-gray-500">Resumen de tickets, inventario y documentación.</p>
+            <h1 class="text-2xl font-bold">Inicio</h1>
+            <p class="text-sm text-gray-500">Resumen de tickets</p>
         </div>
         <div class="flex gap-2">
             <a href="{% url 'tickets_create' %}" class="btn btn-primary btn-sm">Crear ticket</a>
@@ -47,33 +47,10 @@
             <div class="card-body">
                 <div class="mb-4 flex flex-wrap items-center justify-between gap-2">
                     <h2 class="card-title text-lg">Distribución por estado</h2>
-                    <div class="badge badge-outline">Actualizado en tiempo real</div>
                 </div>
                 <div class="flex flex-col gap-4 lg:flex-row">
                     <div class="rounded-box border border-base-300 bg-base-200/30 p-3 lg:w-1/2">
                         <canvas id="estadoChart" class="max-h-72"></canvas>
-                    </div>
-                    <div class="overflow-x-auto lg:w-1/2">
-                        <table class="table table-zebra table-sm">
-                            <thead>
-                                <tr>
-                                    <th>Estado</th>
-                                    <th>Total</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for estado, total in estado_totales.items %}
-                                <tr>
-                                    <td>{{ estado }}</td>
-                                    <td><span class="badge badge-ghost">{{ total }}</span></td>
-                                </tr>
-                                {% empty %}
-                                <tr>
-                                    <td colspan="2" class="text-center text-base-content/60">Sin tickets registrados.</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
                     </div>
                 </div>
             </div>
@@ -87,9 +64,11 @@
                     <li class="rounded-box flex items-center justify-between border border-base-300 p-3"><span>Activos asignados</span><span class="badge badge-accent badge-lg">{{ kpis.activos_asignados }}</span></li>
                     <li class="rounded-box flex items-center justify-between border border-base-300 p-3"><span>Documentos cargados</span><span class="badge badge-secondary badge-lg">{{ kpis.documentos_totales }}</span></li>
                 </ul>
-                <div class="mt-4 rounded-box border border-base-300 bg-base-200/30 p-3">
+                <div class="mt-4 rounded-box border border-base-300 bg-base-200/30 p-3 h-72">
                     <h3 class="mb-2 text-sm font-semibold text-base-content/70">Tickets por prioridad</h3>
-                    <canvas id="prioridadChart" class="max-h-56"></canvas>
+                    <div class="relative h-64 w-full p-8"> 
+                        <canvas id="prioridadChart" class="h-full w-full"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
@@ -173,7 +152,7 @@
                 labels: estadoLabels,
                 datasets: [{
                     data: estadoValues,
-                    backgroundColor: ['#f59e0b', '#22c55e', '#3b82f6', '#ef4444', '#8b5cf6'],
+                    backgroundColor: ['#6B7280', '#3B82F6', '#F59E0B', '#10B981', '#8b5cf6'],
                     borderWidth: 0,
                 }],
             },
@@ -182,6 +161,7 @@
                     legend: { position: 'bottom' },
                 },
                 maintainAspectRatio: false,
+                responsive: true,
             },
         });
     }
@@ -195,7 +175,7 @@
                 datasets: [{
                     label: 'Tickets',
                     data: prioridadesTotales.map((item) => item.total),
-                    backgroundColor: '#6366f1',
+                    backgroundColor: ['#EF4444', '#FACC15', '#F97316', '#94A3B8', '#E2E8F0'],
                     borderRadius: 8,
                 }],
             },
@@ -210,6 +190,7 @@
                     },
                 },
                 maintainAspectRatio: false,
+                responsive: true,
             },
         });
     }

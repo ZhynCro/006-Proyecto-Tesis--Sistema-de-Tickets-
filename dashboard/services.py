@@ -26,7 +26,7 @@ def build_dashboard_context(request):
     }
 
     prioridades_totales = list(
-        tickets_all.values('prioridad_id').annotate(total=Count('id')).order_by('-total')
+        tickets_all.values('prioridad_id').annotate(total=Count('id')).order_by('prioridad__id')
     )
 
     current_user = get_current_usuario(request)
