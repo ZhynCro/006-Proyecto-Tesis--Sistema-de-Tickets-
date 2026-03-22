@@ -16,86 +16,82 @@
     </div>
 
     <div class="flex flex-wrap gap-4">
-        <div class="card w-full border border-primary/10 bg-base-100 shadow-sm sm:w-[calc(50%-0.5rem)] lg:flex-1">
+        <div class="card w-full rounded-box border border-base-300 bg-base-100 shadow-sm sm:w-[calc(50%-0.5rem)] lg:flex-1">
             <div class="card-body p-4">
-                <p class="text-sm text-base-content/70">Tickets totales</p>
-                <p class="text-3xl font-semibold">{{ kpis.tickets_totales }}</p>
+                <p class="text-lg text-base-content/70">Tickets totales</p>
+                <p class="text-3xl font-bold">{{ kpis.tickets_totales }}</p>
             </div>
         </div>
-        <div class="card w-full border border-warning/20 bg-base-100 shadow-sm sm:w-[calc(50%-0.5rem)] lg:flex-1">
+        <div class="card w-full rounded-box border border-base-300 bg-base-100 shadow-sm sm:w-[calc(50%-0.5rem)] lg:flex-1">
             <div class="card-body p-4">
-                <p class="text-sm text-base-content/70">Tickets abiertos</p>
-                <p class="text-3xl font-semibold text-warning">{{ kpis.tickets_abiertos }}</p>
+                <p class="text-lg text-base-content/70">Tickets abiertos</p>
+                <p class="text-3xl font-bold text-warning">{{ kpis.tickets_abiertos }}</p>
             </div>
         </div>
-        <div class="card w-full border border-success/20 bg-base-100 shadow-sm sm:w-[calc(50%-0.5rem)] lg:flex-1">
+        <div class="card w-full rounded-box border border-base-300 bg-base-100 shadow-sm sm:w-[calc(50%-0.5rem)] lg:flex-1">
             <div class="card-body p-4">
-                <p class="text-sm text-base-content/70">Resueltos</p>
-                <p class="text-3xl font-semibold text-success">{{ kpis.tickets_resueltos }}</p>
+                <p class="text-lg text-base-content/70">Resueltos</p>
+                <p class="text-3xl font-bold text-success">{{ kpis.tickets_resueltos }}</p>
             </div>
         </div>
-        <div class="card w-full border border-error/20 bg-base-100 shadow-sm sm:w-[calc(50%-0.5rem)] lg:flex-1">
+        <div class="card w-full rounded-box border border-base-300 bg-base-100 sm:w-[calc(50%-0.5rem)] lg:flex-1">
             <div class="card-body p-4">
-                <p class="text-sm text-base-content/70">Sin asignar</p>
-                <p class="text-3xl font-semibold text-error">{{ kpis.tickets_sin_asignar }}</p>
+                <p class="text-lg text-base-content/70">Sin asignar</p>
+                <p class="text-3xl font-bold text-error">{{ kpis.tickets_sin_asignar }}</p>
             </div>
         </div>
     </div>
+
+    <div class="flex flex-row gap-4 lg:flex-row w-full">
+        <div class="card flex-1 rounded-box border border-base-300 bg-base-100">
+            <div class="card-body">
+                <h2 class="card-title text-2xl p-2 font-semibold text-center">Distribución por estado</h2>
+                <div class="p-4 h-72">
+                    <div class="relative h-full w-full"> 
+                        <canvas id="estadoChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card flex-1 rounded-box border border-base-300 bg-base-100">
+            <div class="card-body">
+                <h2 class="card-title text-2xl p-2 font-semibold text-center">Tickets por prioridad</h2>
+                <div class="p-4 h-72">
+                    <div class="relative h-full w-full"> 
+                        <canvas id="prioridadChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="flex flex-col gap-4 xl:flex-row">
-        <div class="card w-full bg-base-100 shadow-sm xl:w-3/5">
-            <div class="card-body">
-                <div class="mb-4 flex flex-wrap items-center justify-between gap-2">
-                    <h2 class="card-title text-lg">Distribución por estado</h2>
+        <div class="w-full shadow-sm xl:w-1/3">
+            <div class="flex gap-4">
+                <div class="card flex-1 rounded-box border border-base-300 bg-base-100 shadow-sm">
+                    <div class="card-body p-4">
+                        <p class="text-3xl text-base-content/70">Activos registrados</p>
+                        <p class="text-xl font-semibold">{{ kpis.activos_totales }} <span class="text-sm font-normal text-gray-400">/ {{ kpis.activos_asignados }} asig.</span></p>
+                    </div>
                 </div>
-                <div class="flex flex-col gap-4 lg:flex-row">
-                    <div class="rounded-box border border-base-300 bg-base-200/30 p-3 lg:w-1/2">
-                        <canvas id="estadoChart" class="max-h-72"></canvas>
+                <div class="card flex-1 rounded-box border border-base-300 bg-base-100 shadow-sm">
+                    <div class="card-body p-4">
+                        <p class="text-3xl text-base-content/70">Documentos Almacenados</p>
+                        <p class="text-xl font-semibold">{{ kpis.documentos_totales }}</p>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="card w-full bg-base-100 shadow-sm xl:w-2/5">
+        <div class="card flex-1 bg-base-100 shadow-sm"> 
             <div class="card-body">
-                <h2 class="card-title text-lg">Inventario y docs</h2>
-                <div class="flex flex-wrap gap-4">
-                    <div class="card w-full border border-primary/10 bg-base-100 shadow-sm sm:w-[calc(50%-0.5rem)] lg:flex-1">
-                        <div class="card-body p-4">
-                            <p class="text-sm text-base-content/70">Activos totales</p>
-                            <p class="text-3xl font-semibold">{{ kpis.activos_totales }}</p>
-                        </div>
-                    </div>
-                    <div class="card w-full border border-primary/10 bg-base-100 shadow-sm sm:w-[calc(50%-0.5rem)] lg:flex-1">
-                        <div class="card-body p-4">
-                            <p class="text-sm text-base-content/70">Activos asignados</p>
-                            <p class="text-3xl font-semibold">{{ kpis.activos_asignados }}</p>
-                        </div>
-                    </div>
-                    <div class="card w-full border border-primary/10 bg-base-100 shadow-sm sm:w-[calc(50%-0.5rem)] lg:flex-1">
-                        <div class="card-body p-4">
-                            <p class="text-sm text-base-content/70">Documentos cargados</p>
-                            <p class="text-3xl font-semibold">{{ kpis.documentos_totales }}</p>
-                        </div>
-                    </div>
+                <div class="flex justify-between w-full p-4">
+                    <h2 class="flex-1 text-lg font-bold m-0">Tickets recientes</h2>
+                    <a href="{% url 'tickets_view' %}" class="btn btn-primary btn-sm justify-end">Ver todos</a>
                 </div>
-                <div class="mt-4 rounded-box border border-base-300 bg-base-200/30 p-3 h-72">
-                    <h3 class="mb-2 text-sm font-semibold text-base-content/70">Tickets por prioridad</h3>
-                    <div class="relative h-64 w-full p-8"> 
-                        <canvas id="prioridadChart" class="h-full w-full"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="flex flex-col gap-4 lg:flex-row">
-        <div class="card w-full bg-base-100 shadow-sm lg:w-1/2">
-            <div class="card-body">
-                <div class="flex items-center justify-between">
-                    <h2 class="card-title text-lg">Tickets recientes</h2>
-                    <a href="{% url 'tickets_view' %}" class="link link-primary text-sm">Ver todos</a>
-                </div>
-                <div class="overflow-x-auto">
+                
+                <div class="overflow-x-auto p-4">
                     <table class="table table-zebra table-sm">
                         <thead>
                             <tr>
@@ -108,33 +104,17 @@
                             {% for ticket in tickets_recientes %}
                             <tr>
                                 <td>{{ ticket.codigo_ticket }}</td>
-                                <td><span class="badge badge-outline">{{ ticket.estado }}</span></td>
-                                <td><span class="badge badge-ghost">{{ ticket.prioridad_id }}</span></td>
+                                <td><span class="badge badge-sm badge-outline">{{ ticket.estado }}</span></td>
+                                <td><span class="badge badge-sm badge-ghost">{{ ticket.prioridad_id }}</span></td>
                             </tr>
                             {% empty %}
                             <tr>
-                                <td colspan="3" class="text-center text-base-content/60">No hay tickets recientes.</td>
+                                <td colspan="3" class="text-center text-base-content/60 py-4">No hay tickets recientes.</td>
                             </tr>
                             {% endfor %}
                         </tbody>
                     </table>
                 </div>
-            </div>
-        </div>
-
-        <div class="card w-full bg-base-100 shadow-sm lg:w-1/2">
-            <div class="card-body">
-                <h2 class="card-title text-lg">Mis tickets activos</h2>
-                <ul class="space-y-2">
-                    {% for ticket in mis_tickets %}
-                    <li class="rounded-box border border-base-300 p-3 text-sm">
-                        <p class="font-medium">{{ ticket.codigo_ticket }} · {{ ticket.titulo }}</p>
-                        <p class="text-base-content/60">{{ ticket.estado }} · {{ ticket.prioridad_id }}</p>
-                    </li>
-                    {% empty %}
-                    <li class="text-sm text-base-content/60">No tienes tickets asignados activos.</li>
-                    {% endfor %}
-                </ul>
             </div>
         </div>
     </div>
@@ -148,61 +128,50 @@
     const estadoElement = document.getElementById('estado-totales-data');
     const prioridadElement = document.getElementById('prioridad-totales-data');
 
-    if (!estadoElement || !prioridadElement || typeof Chart === 'undefined') {
-        return;
-    }
+    if (!estadoElement || !prioridadElement || typeof Chart === 'undefined') return;
 
     const estadoTotales = JSON.parse(estadoElement.textContent);
     const prioridadesTotales = JSON.parse(prioridadElement.textContent);
 
-    const estadoLabels = Object.keys(estadoTotales);
-    const estadoValues = Object.values(estadoTotales);
+    const coloresEstados = { 'Pendiente': '#F59E0B', 'En Progreso': '#3B82F6', 'Resuelto': '#10B981', 'Cerrado': '#6B7280' };
+    const coloresPrioridad = { 'Critica': '#EF4444', 'Alta': '#F97316', 'Media': '#FACC15', 'Baja': '#94A3B8', 'N/A': '#E2E8F0' };
 
+    // --- Chart Estado (Dona) ---
     const estadoCanvas = document.getElementById('estadoChart');
-    if (estadoCanvas && estadoLabels.length > 0) {
+    if (estadoCanvas) {
         new Chart(estadoCanvas, {
             type: 'doughnut',
             data: {
-                labels: estadoLabels,
+                labels: Object.keys(estadoTotales),
                 datasets: [{
-                    data: estadoValues,
-                    backgroundColor: ['#6B7280', '#3B82F6', '#F59E0B', '#10B981', '#8b5cf6'],
+                    data: Object.values(estadoTotales),
+                    backgroundColor: Object.keys(estadoTotales).map(l => coloresEstados[l] || '#CBD5E1'),
                     borderWidth: 0,
                 }],
             },
             options: {
-                plugins: {
-                    legend: { position: 'bottom' },
-                },
+                plugins: { legend: { position: 'bottom' } },
                 maintainAspectRatio: false,
                 responsive: true,
             },
         });
     }
 
+    // --- Chart Prioridad (Dona) ---
     const prioridadCanvas = document.getElementById('prioridadChart');
-    if (prioridadCanvas && prioridadesTotales.length > 0) {
+    if (prioridadCanvas) {
         new Chart(prioridadCanvas, {
-            type: 'bar',
+            type: 'doughnut',
             data: {
-                labels: prioridadesTotales.map((item) => item.prioridad_id || 'Sin prioridad'),
+                labels: prioridadesTotales.map(item => item.prioridad_id || item.prioridad || 'Sin prioridad'),
                 datasets: [{
-                    label: 'Tickets',
-                    data: prioridadesTotales.map((item) => item.total),
-                    backgroundColor: ['#EF4444', '#FACC15', '#F97316', '#94A3B8', '#E2E8F0'],
-                    borderRadius: 8,
+                    data: prioridadesTotales.map(item => item.total),
+                    backgroundColor: prioridadesTotales.map(item => coloresPrioridad[item.prioridad_id || item.prioridad] || '#94A3B8'),
+                    borderWidth: 0,
                 }],
             },
             options: {
-                plugins: {
-                    legend: { display: false },
-                },
-                scales: {
-                    y: {
-                        ticks: { precision: 0 },
-                        beginAtZero: true,
-                    },
-                },
+                plugins: { legend: { position: 'bottom' } },
                 maintainAspectRatio: false,
                 responsive: true,
             },
