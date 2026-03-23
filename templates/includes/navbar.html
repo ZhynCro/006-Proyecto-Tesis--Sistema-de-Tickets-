@@ -1,12 +1,14 @@
-<div class="navbar bg-base-100 border-b border-base-300 px-4">
+{% load tailwind_tags %}
+{% load static %}
+
+<div class="navbar bg-brand border-b border-base-300 px-4">
   <div class="flex-1">
     <label for="main-drawer" class="btn btn-ghost lg:hidden">
       <i class="fa-solid fa-bars"></i>
     </label>
-    <div class="hidden md:flex ml-2">
-      <div class="form-control">
-        <input type="text" placeholder="Buscar ticket..." class="input input-bordered w-24 md:w-auto h-9" />
-      </div>
+    <div class="hidden md:flex ml-4">
+        <img src="{% static 'img/logo-estelar-latinoamerica.png' %}" alt="Logo" class="h-16">
+      </a>
     </div>
   </div>
   <div class="flex-none gap-2">
