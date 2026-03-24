@@ -1,7 +1,10 @@
 <aside class="bg-gray-200 w-64 min-h-screen border-r border-base-300 hidden lg:block">
   <ul class="menu w-full px-4 gap-2">
     <li class="menu-title text-gray-400">Menú Principal</li>
-    <li><a href="{% url 'dashboard_view' %}" class="active"><i class="fa-solid fa-chart-line"></i> Dashboard</a></li>
+    {% if perms.tickets.view_tickets %}
+      <li><a href="{% url 'dashboard_view' %}" class="active"><i class="fa-solid fa-chart-line"></i> Dashboard</a></li>
+    {% endif %}
+    {% if perms.tickets.view_tickets %}
     <li>
       <details open>
         <summary><i class="fa-solid fa-ticket"></i> Tickets</summary>
@@ -12,6 +15,8 @@
         </ul>
       </details>
     </li>
+    {% endif %}
+    {% if perms.inventory.view_activos %}
     <li>
       <details open>
         <summary><i class="fa-solid fa-warehouse"></i> Inventario</summary>
@@ -21,15 +26,21 @@
         </ul>
       </details>
     </li>
+    {% endif %}
+    {% if perms.library.view_tutorial %}
     <li>
       <details open>
         <summary><i class="fa-solid fa-book"></i> Docs</summary>
         <ul>
           <li><a href="{% url 'library_view' %}">Manuales</a></li>
+          {% if perms.library.add_tutorial %}
           <li><a href="{% url 'library_create' %}">Cargar Manuales</a></li>
+          {% endif %}
         </ul>
       </details>
     </li>
+    {% endif %}
+    {% if perms.users.view_usuario %}
     <li class="menu-title mt-4 text-gray-400">Administración</li>
     <li>
       <details open>
@@ -40,7 +51,9 @@
         </ul>
       </details>
     </li>
+    {% endif %}
+    {% if request.user.is_superuser %}
     <li><a href="/admin/"><i class="fa-solid fa-user-tie"></i> Acceso django Admin</a></li>
+    {% endif %}
   </ul>
 </aside>
-

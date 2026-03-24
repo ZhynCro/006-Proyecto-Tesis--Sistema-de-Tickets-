@@ -9,7 +9,9 @@
             <h1 class="text-2xl font-bold">Tickets</h1>
             <p class="text-sm text-gray-500">Tickets activos</p>
         </div>
+        {% if perms.tickets.add_tickets %}
         <a href="{% url 'tickets_create' %}" class="btn btn-primary btn-sm">Crear ticket</a>
+        {% endif %}
     </div>
 
     
@@ -35,15 +37,7 @@
                 {% for usuario in usuarios_asignados %}
                     <option value="{{ usuario.ID_empleado }}" {% if filtros.usuario_asignado == usuario.ID_empleado %}selected{% endif %}>{{ usuario }}</option>
                 {% endfor %}
-            </select>
-        </div>
-
-        <div class="form-control min-w-55 flex-1">
-            <label class="label" for="prioridad">
-                <span class="label-text">Prioridad</span>
-            </label>
-            <select id="prioridad" name="prioridad" class="select select-bordered select-sm w-full">
-                <option value="">Todas</option>
+@@ -47,98 +49,110 @@
                 {% for prioridad_item in prioridades %}
                     <option value="{{ prioridad_item.prioridad }}" {% if filtros.prioridad == prioridad_item.prioridad %}selected{% endif %}>{{ prioridad_item.prioridad }}</option>
                 {% endfor %}
@@ -69,15 +63,19 @@
 
     <form method="post" action="{% url 'tickets_delete' %}" class="space-y-4">
         {% csrf_token %}
+        {% if perms.tickets.delete_tickets %}
         <div class="flex justify-end">
             <button type="submit" id="delete-button" class="btn btn-error btn-sm hidden">Borrar seleccionados</button>
         </div>
+        {% endif %}
 
         <div class="overflow-x-auto bg-base-100 rounded-lg shadow">
             <table class="table w-full">
                 <thead>
                     <tr>
+                        {% if perms.tickets.delete_tickets %}
                         <th><input type="checkbox" id="select-all" class="checkbox checkbox-sm" /></th>
+                        {% endif %}
                         <th>Título</th>
                         <th>Estado</th>
                         <th>Creado</th>
@@ -92,9 +90,11 @@
                 <tbody>
                     {% for ticket in tickets %}
                         <tr>
+                            {% if perms.tickets.delete_tickets %}
                             <td>
                                 <input type="checkbox" name="tickets_seleccionados" value="{{ ticket.id }}" class="checkbox checkbox-sm row-checkbox" />
                             </td>
+                            {% endif %}
                             <td>{{ ticket.titulo }}</td>
                             <td>{{ ticket.estado }}</td>
                             <td>{{ ticket.fecha_creacion }}</td>
@@ -104,12 +104,16 @@
                             <td>{{ ticket.solicitante }}</td>
                             <td>{{ ticket.usuario|default:'Sin asignar' }}</td>
                             <td>
+                                {% if perms.tickets.change_tickets %}
                                 <a href="{% url 'tickets_edit' ticket.id %}" class="btn btn-ghost btn-xs">Editar</a>
+                                {% else %}
+                                <span class="text-gray-400 text-xs">Sin acciones</span>
+                                {% endif %}
                             </td>
                         </tr>
                     {% empty %}
                         <tr>
-                            <td colspan="10" class="text-center text-gray-500 py-6">No hay tickets registrados.</td>
+                            <td colspan="{% if perms.tickets.delete_tickets %}10{% else %}9{% endif %}" class="text-center text-gray-500 py-6">No hay tickets registrados.</td>
                         </tr>
                     {% endfor %}
                 </tbody>
@@ -123,22 +127,24 @@
     const checkboxes = document.querySelectorAll('.row-checkbox');
     const selectAll = document.getElementById('select-all');
 
-    const updateDeleteButton = () => {
-        const anyChecked = Array.from(checkboxes).some((checkbox) => checkbox.checked);
-        deleteButton.classList.toggle('hidden', !anyChecked);
-    };
+    if (deleteButton) {
+        const updateDeleteButton = () => {
+            const anyChecked = Array.from(checkboxes).some((checkbox) => checkbox.checked);
+            deleteButton.classList.toggle('hidden', !anyChecked);
+        };
 
-    checkboxes.forEach((checkbox) => {
-        checkbox.addEventListener('change', updateDeleteButton);
-    });
-
-    if (selectAll) {
-        selectAll.addEventListener('change', (event) => {
-            checkboxes.forEach((checkbox) => {
-                checkbox.checked = event.target.checked;
-            });
-            updateDeleteButton();
+        checkboxes.forEach((checkbox) => {
+            checkbox.addEventListener('change', updateDeleteButton);
         });
+
+        if (selectAll) {
+            selectAll.addEventListener('change', (event) => {
+                checkboxes.forEach((checkbox) => {
+                    checkbox.checked = event.target.checked;
+                });
+                updateDeleteButton();
+            });
+        }
     }
 </script>
 {% endblock %}

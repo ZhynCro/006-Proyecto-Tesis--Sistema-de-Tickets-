@@ -9,7 +9,9 @@
             <h1 class="text-2xl font-bold">Usuarios registrados</h1>
             <p class="text-sm text-gray-500">Listado de usuarios creados en el sistema.</p>
         </div>
+        {% if perms.users.add_usuario %}
         <a href="{% url 'user_create' %}" class="btn btn-primary btn-sm">Crear usuario</a>
+        {% endif %}
     </div>
 
     {% if messages %}
@@ -24,6 +26,7 @@
 
     <form method="post" id="users-form" action="{% url 'user_delete' %}" class="space-y-4">
         {% csrf_token %}
+        {% if perms.users.delete_usuario %}
         <div class="flex justify-end">
             <button
                 type="submit"
@@ -33,14 +36,17 @@
                 Borrar seleccionados
             </button>
         </div>
+        {% endif %}
 
         <div class="overflow-x-auto bg-base-100 rounded-lg shadow">
             <table class="table w-full">
                 <thead>
                     <tr>
+                        {% if perms.users.delete_usuario %}
                         <th>
                             <input type="checkbox" id="select-all" class="checkbox checkbox-sm" />
                         </th>
+                        {% endif %}
                         <th>ID_empleado</th>
                         <th>Nombre</th>
                         <th>Apellido</th>
@@ -54,6 +60,7 @@
                 <tbody>
                     {% for usuario in usuarios %}
                         <tr>
+                            {% if perms.users.delete_usuario %}
                             <td>
                                 <input
                                     type="checkbox"
@@ -62,6 +69,7 @@
                                     class="checkbox checkbox-sm row-checkbox"
                                 />
                             </td>
+                            {% endif %}
                             <td>{{ usuario.ID_empleado }}</td>
                             <td>{{ usuario.first_name }}</td>
                             <td>{{ usuario.last_name }}</td>
@@ -70,12 +78,16 @@
                             <td>{{ usuario.sede }}</td>
                             <td>{{ usuario.is_active|yesno:"Activo,Inactivo"}}</td>
                             <td>
+                                {% if perms.users.change_usuario %}
                                 <a href="{% url 'user_edit' usuario.id %}" class="btn btn-ghost btn-xs">Editar</a>
+                                {% else %}
+                                <span class="text-gray-400 text-xs">Sin acciones</span>
+                                {% endif %}
                             </td>
                         </tr>
                     {% empty %}
                         <tr>
-                            <td colspan="8" class="text-center text-gray-500 py-6">No hay usuarios registrados.</td>
+                            <td colspan="{% if perms.users.delete_usuario %}9{% else %}8{% endif %}" class="text-center text-gray-500 py-6">No hay usuarios registrados.</td>
                         </tr>
                     {% endfor %}
                 </tbody>
@@ -89,22 +101,24 @@
     const checkboxes = document.querySelectorAll('.row-checkbox');
     const selectAll = document.getElementById('select-all');
 
-    const updateDeleteButton = () => {
-        const anyChecked = Array.from(checkboxes).some((checkbox) => checkbox.checked);
-        deleteButton.classList.toggle('hidden', !anyChecked);
-    };
+    if (deleteButton) {
+        const updateDeleteButton = () => {
+            const anyChecked = Array.from(checkboxes).some((checkbox) => checkbox.checked);
+            deleteButton.classList.toggle('hidden', !anyChecked);
+        };
 
-    checkboxes.forEach((checkbox) => {
-        checkbox.addEventListener('change', updateDeleteButton);
-    });
-
-    if (selectAll) {
-        selectAll.addEventListener('change', (event) => {
-            checkboxes.forEach((checkbox) => {
-                checkbox.checked = event.target.checked;
-            });
-            updateDeleteButton();
+        checkboxes.forEach((checkbox) => {
+            checkbox.addEventListener('change', updateDeleteButton);
         });
+
+        if (selectAll) {
+            selectAll.addEventListener('change', (event) => {
+                checkboxes.forEach((checkbox) => {
+                    checkbox.checked = event.target.checked;
+                });
+                updateDeleteButton();
+            });
+        }
     }
 </script>
 {% endblock %}

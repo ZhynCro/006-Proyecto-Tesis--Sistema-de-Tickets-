@@ -9,7 +9,9 @@
             <h1 class="text-2xl font-bold">Biblioteca</h1>
             <p class="text-sm text-gray-500">Tutoriales y documentos cargados</p>
         </div>
+        {% if perms.library.add_tutorial %}
         <a href="{% url 'library_create' %}" class="btn btn-primary btn-sm">Subir documento</a>
+        {% endif %}
     </div>
 
     {% if messages %}
@@ -24,15 +26,19 @@
 
     <form method="post" action="{% url 'library_delete' %}" class="space-y-4">
         {% csrf_token %}
+        {% if perms.library.delete_tutorial %}
         <div class="flex justify-end">
             <button type="submit" id="delete-button" class="btn btn-error btn-sm hidden">Eliminar seleccionados</button>
         </div>
+        {% endif %}
 
         <div class="overflow-x-auto bg-base-100 rounded-lg shadow">
             <table class="table w-full">
                 <thead>
                     <tr>
+                        {% if perms.library.delete_tutorial %}
                         <th><input type="checkbox" id="select-all" class="checkbox checkbox-sm" /></th>
+                        {% endif %}
                         <th>Título</th>
                         <th>Archivo original</th>
                         <th>Extensión</th>
@@ -45,7 +51,9 @@
                 <tbody>
                     {% for tutorial in tutoriales %}
                         <tr>
+                            {% if perms.library.delete_tutorial %}
                             <td><input type="checkbox" name="tutoriales_seleccionados" value="{{ tutorial.id }}" class="checkbox checkbox-sm row-checkbox" /></td>
+                            {% endif %}
                             <td>{{ tutorial.titulo }}</td>
                             <td>{{ tutorial.nombre_original }}</td>
                             <td>{{ tutorial.extension }}</td>
@@ -54,12 +62,14 @@
                             <td class="text-xs">{{ tutorial.archivo_path }}</td>
                             <td class="space-x-1">
                                 <a href="{% url 'library_download' tutorial.id %}" class="btn btn-ghost btn-xs">Descargar</a>
+                                {% if perms.library.change_tutorial %}
                                 <a href="{% url 'library_edit' tutorial.id %}" class="btn btn-ghost btn-xs">Editar</a>
+                                {% endif %}
                             </td>
                         </tr>
                     {% empty %}
                         <tr>
-                            <td colspan="8" class="text-center text-gray-500 py-6">No hay documentos registrados.</td>
+                            <td colspan="{% if perms.library.delete_tutorial %}8{% else %}7{% endif %}" class="text-center text-gray-500 py-6">No hay documentos registrados.</td>
                         </tr>
                     {% endfor %}
                 </tbody>
@@ -73,22 +83,24 @@
     const checkboxes = document.querySelectorAll('.row-checkbox');
     const selectAll = document.getElementById('select-all');
 
-    const updateDeleteButton = () => {
-        const anyChecked = Array.from(checkboxes).some((checkbox) => checkbox.checked);
-        deleteButton.classList.toggle('hidden', !anyChecked);
-    };
+    if (deleteButton) {
+        const updateDeleteButton = () => {
+            const anyChecked = Array.from(checkboxes).some((checkbox) => checkbox.checked);
+            deleteButton.classList.toggle('hidden', !anyChecked);
+        };
 
-    checkboxes.forEach((checkbox) => {
-        checkbox.addEventListener('change', updateDeleteButton);
-    });
-
-    if (selectAll) {
-        selectAll.addEventListener('change', (event) => {
-            checkboxes.forEach((checkbox) => {
-                checkbox.checked = event.target.checked;
-            });
-            updateDeleteButton();
+        checkboxes.forEach((checkbox) => {
+            checkbox.addEventListener('change', updateDeleteButton);
         });
+
+        if (selectAll) {
+            selectAll.addEventListener('change', (event) => {
+                checkboxes.forEach((checkbox) => {
+                    checkbox.checked = event.target.checked;
+                });
+                updateDeleteButton();
+            });
+        }
     }
 </script>
 {% endblock %}

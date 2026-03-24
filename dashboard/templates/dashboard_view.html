@@ -10,8 +10,12 @@
             <p class="text-sm text-gray-500">Resumen de tickets</p>
         </div>
         <div class="flex gap-2">
+            {% if perms.tickets.add_tickets %}
             <a href="{% url 'tickets_create' %}" class="btn btn-primary btn-sm">Crear ticket</a>
+            {% endif %}
+            {% if perms.tickets.view_tickets %}
             <a href="{% url 'tickets_view_pending' %}" class="btn btn-outline btn-sm">Ver pendientes</a>
+            {% endif %}
         </div>
     </div>
 
@@ -88,7 +92,9 @@
             <div class="card-body">
                 <div class="flex justify-between w-full p-4">
                     <h2 class="flex-1 text-lg font-bold m-0">Tickets recientes</h2>
+                     {% if perms.tickets.view_tickets %}
                     <a href="{% url 'tickets_view' %}" class="btn btn-primary btn-sm justify-end">Ver todos</a>
+                    {% endif %}
                 </div>
                 
                 <div class="overflow-x-auto p-4">

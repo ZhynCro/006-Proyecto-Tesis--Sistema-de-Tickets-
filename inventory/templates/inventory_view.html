@@ -9,7 +9,9 @@
             <h1 class="text-2xl font-bold">Equipos</h1>
             <p class="text-sm text-gray-500">Equipos actualmente regitrados</p>
         </div>
+        {% if perms.inventory.add_activos %}
         <a href="{% url 'inventory_create' %}" class="btn btn-primary btn-sm">Registrar activo</a>
+        {% endif %}
     </div>
 
     {% if messages %}
@@ -25,14 +27,20 @@
     <form method="post" action="{% url 'inventory_delete' %}" class="space-y-4">
         {% csrf_token %}
         <div class="flex justify-end">
+            {% if perms.inventory.delete_activos %}
             <button type="submit" id="delete-button" class="btn btn-error btn-sm hidden">Borrar seleccionados</button>
+            {% endif %}
+
         </div>
 
         <div class="overflow-x-auto bg-base-100 rounded-lg shadow">
             <table class="table w-full">
                 <thead>
                     <tr>
+                        {% if perms.inventory.delete_activos %}
                         <th><input type="checkbox" id="select-all" class="checkbox checkbox-sm" /></th>
+                        {% endif %}
+
                         <th>Código</th>
                         <th>Categoría</th>
                         <th>Marca</th>
@@ -48,9 +56,12 @@
                 <tbody>
                     {% for activo in activos %}
                         <tr>
+                            {% if perms.inventory.delete_activos %}
                             <td>
+                                
                                 <input type="checkbox" name="activos_seleccionados" value="{{ activo.codigo }}" class="checkbox checkbox-sm row-checkbox" />
                             </td>
+                            {% endif %}
                             <td>{{ activo.codigo }}</td>
                             <td>{{ activo.categoria }}</td>
                             <td>{{ activo.marca }}</td>
@@ -61,12 +72,14 @@
                             <td>{{ activo.departamento }}</td>
                             <td>{{ activo.estado }}</td>
                             <td>
+                                {% if perms.inventory.change_activos %}
                                 <a href="{% url 'inventory_edit' activo.codigo %}" class="btn btn-ghost btn-xs">Editar</a>
+                                {% endif %}
                             </td>
                         </tr>
                     {% empty %}
                         <tr>
-                            <td colspan="11" class="text-center text-gray-500 py-6">No hay activos activos registrados.</td>
+                            <td colspan="{% if perms.inventory.delete_activos %}11{% else %}10{% endif %}" class="text-center text-gray-500 py-6">No hay activos activos registrados.</td>
                         </tr>
                     {% endfor %}
                 </tbody>
@@ -80,22 +93,24 @@
     const checkboxes = document.querySelectorAll('.row-checkbox');
     const selectAll = document.getElementById('select-all');
 
-    const updateDeleteButton = () => {
-        const anyChecked = Array.from(checkboxes).some((checkbox) => checkbox.checked);
-        deleteButton.classList.toggle('hidden', !anyChecked);
-    };
+     if (deleteButton) {
+        const updateDeleteButton = () => {
+            const anyChecked = Array.from(checkboxes).some((checkbox) => checkbox.checked);
+            deleteButton.classList.toggle('hidden', !anyChecked);
+        };
 
-    checkboxes.forEach((checkbox) => {
-        checkbox.addEventListener('change', updateDeleteButton);
-    });
-
-    if (selectAll) {
-        selectAll.addEventListener('change', (event) => {
-            checkboxes.forEach((checkbox) => {
-                checkbox.checked = event.target.checked;
-            });
-            updateDeleteButton();
+        checkboxes.forEach((checkbox) => {
+            checkbox.addEventListener('change', updateDeleteButton);
         });
+
+        if (selectAll) {
+            selectAll.addEventListener('change', (event) => {
+                checkboxes.forEach((checkbox) => {
+                    checkbox.checked = event.target.checked;
+                });
+                updateDeleteButton();
+            });
+        }
     }
 </script>
 {% endblock %}

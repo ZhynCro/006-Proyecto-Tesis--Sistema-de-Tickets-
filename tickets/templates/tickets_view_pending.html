@@ -1,8 +1,3 @@
-{% extends 'base.html' %}
-
-{% block title %}Tickets pendientes{% endblock %}
-
-{% block content %}
 <div class="space-y-6">
     <div>
         <h1 class="text-2xl font-bold">Tickets pendientes</h1>
@@ -28,7 +23,13 @@
                         <td>{{ ticket.activo_afectado }}</td>
                         <td>{{ ticket.solicitante }}</td>
                         <td>{{ ticket.usuario|default:'Sin asignar' }}</td>
-                        <td><a href="{% url 'tickets_edit' ticket.id %}" class="btn btn-ghost btn-xs">Editar</a></td>
+                        <td>
+                            {% if perms.tickets.change_tickets %}
+                            <a href="{% url 'tickets_edit' ticket.id %}" class="btn btn-ghost btn-xs">Editar</a>
+                            {% else %}
+                            <span class="text-gray-400 text-xs">Sin acciones</span>
+                            {% endif %}
+                        </td>
                     </tr>
                 {% empty %}
                     <tr>
