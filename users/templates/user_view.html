@@ -53,6 +53,7 @@
                         <th>Email</th>
                         <th>Departamento</th>
                         <th>Sede</th>
+                        <th>Grupo</th>
                         <th>Estado</th>
                         <th>Acciones</th>
                     </tr>
@@ -76,6 +77,7 @@
                             <td>{{ usuario.email }}</td>
                             <td>{{ usuario.departamento }}</td>
                             <td>{{ usuario.sede }}</td>
+                            <td>{{ usuario.groups.first.name|default:'Sin grupo' }}</td>
                             <td>{{ usuario.is_active|yesno:"Activo,Inactivo"}}</td>
                             <td>
                                 {% if perms.users.change_usuario %}
@@ -87,7 +89,7 @@
                         </tr>
                     {% empty %}
                         <tr>
-                            <td colspan="{% if perms.users.delete_usuario %}9{% else %}8{% endif %}" class="text-center text-gray-500 py-6">No hay usuarios registrados.</td>
+                            <td colspan="{% if perms.users.delete_usuario %}10{% else %}9{% endif %}" class="text-center text-gray-500 py-6">No hay usuarios registrados.</td>
                         </tr>
                     {% endfor %}
                 </tbody>

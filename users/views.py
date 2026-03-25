@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, get_user_model, logout
 from django.shortcuts import redirect, render, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.db import IntegrityError
 
 from users.forms import UsuarioCreationForm, UsuarioUpdateForm
 from .models import usuario
@@ -65,9 +66,13 @@ def user_create (request):
     if request.method == 'POST':
         form = UsuarioCreationForm(request.POST)
         if form.is_valid():
-            form.save()
-            messages.success(request, 'Usuario creado correctamente.')
-            return redirect('user_view')
+            try:
+                form.save()
+            except IntegrityError:
+                form.add_error('ID_empleado', 'Ya existe un usuario con este ID de empleado.')
+            else:
+                messages.success(request, 'Usuario creado correctamente.')
+                return redirect('user_view')
     else:
         form = UsuarioCreationForm()
 
@@ -76,7 +81,12 @@ def user_create (request):
 @login_required
 def user_view(request):
     user_model = get_user_model()
-    usuarios = user_model.objects.select_related('departamento', 'sede').filter(is_active=True).order_by('ID_empleado')
+    usuarios = (
+        user_model.objects.select_related('departamento', 'sede')
+        .prefetch_related('groups')
+        .filter(is_active=True)
+        .order_by('ID_empleado')
+    )
     return render(request, 'user_view.html', {'usuarios': usuarios})
 
 @login_required
@@ -93,7 +103,7 @@ def user_edit(request, user_id):
     else:
         form = UsuarioUpdateForm(instance=usuario)
 
-        return render(request, 'user_edit.html', {'form': form, 'usuario': usuario})
+    return render(request, 'user_edit.html', {'form': form, 'usuario': usuario})
 
 @login_required
 def user_delete(request):
