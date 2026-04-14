@@ -57,7 +57,7 @@ def admin_login_view(request):
 
         login(request, user)
         request.session['admin_login'] = True
-        return redirect('user_view')
+        return redirect('dashboard_view')
 
     return render(request, 'login_admin.html')
 

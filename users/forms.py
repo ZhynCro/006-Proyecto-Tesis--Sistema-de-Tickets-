@@ -27,11 +27,23 @@ class UsuarioCreationForm(UserCreationForm):
             'password1',
             'password2',
         )
+        labels = {
+            'ID_empleado': 'ID Empleado',
+            'username': 'Usuario',
+            'first_name': 'Nombres',
+            'last_name': 'Apellidos',
+            'email': 'Correo electrónico',
+            'departamento': 'Departamento',
+            'sede': 'Sede',
+        }
+
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['grupo'].queryset = Group.objects.order_by('name')
         self.fields['grupo'].widget.attrs['required'] = 'required'
+        self.fields['password1'].label = 'Contraseña'
+        self.fields['password2'].label = 'Confirmar contraseña'
         for field in self.fields.values():
             field.widget.attrs.setdefault(
                 'class',
@@ -81,6 +93,15 @@ class UsuarioUpdateForm(forms.ModelForm):
             'departamento',
             'sede',
         )
+        labels = {
+            'ID_empleado': 'ID Empleado',
+            'username': 'Usuario',
+            'first_name': 'Nombres',
+            'last_name': 'Apellidos',
+            'email': 'Correo electrónico',
+            'departamento': 'Departamento',
+            'sede': 'Sede',
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
