@@ -22,14 +22,21 @@ class TutorialForm(forms.ModelForm):
     class Meta:
         model = Tutorial
         fields = ('titulo', 'descripcion', 'archivo')
+        labels = {
+        'titulo': 'Título',
+        'descripcion': 'Descripción',
+        'archivo': 'Actualizar Archivo',
+    }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        for field in self.fields.values():
+        for name, field in self.fields.items():
             field.widget.attrs.setdefault(
                 'class',
                 'w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-300',
             )
+            if name == 'archivo':
+                field.widget = forms.FileInput(attrs=field.widget.attrs)
 
     # Utils
 

@@ -11,7 +11,7 @@
             {% csrf_token %}
             <div>
                 <label class="block text-gray-700 mb-2">Archivo actual</label>
-                <p class="text-sm text-gray-600">{{ tutorial.nombre_original }} ({{ tutorial.tamano_bytes }} bytes)</p>
+                <p class="text-sm text-gray-600">{{ tutorial.nombre_original }} ({{ tutorial.tamano_bytes }} Bytes)</p>
             </div>
 
             {% for field in form.visible_fields %}
