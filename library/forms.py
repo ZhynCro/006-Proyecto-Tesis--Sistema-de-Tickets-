@@ -5,14 +5,12 @@ from django.core.exceptions import ValidationError
 
 class TutorialForm(forms.ModelForm):
     ALLOWED_EXTENSIONS = {
-        '.pdf', '.docx', '.doc','.xlsx', '.xls', '.pptx', '.txt'
+        '.pdf', '.docx', '.doc', '.pptx', '.txt'
     }
     ALLOWED_MIME_TYPES = {
         'application/pdf',
         'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
         'application/msword',
-        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        'application/vnd.ms-excel',
         'application/vnd.openxmlformats-officedocument.presentationml.presentation',
         'text/plain',
     }

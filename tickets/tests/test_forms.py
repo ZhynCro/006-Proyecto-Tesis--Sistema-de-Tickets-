@@ -22,6 +22,7 @@ class TicketFormsTests(TestCase):
             sede=self.sede,
             departamento=self.depto,
             estado='activo',
+            usuario_asignado=self.user,
         )
         self.prioridad = matriz_prioridad.objects.create(prioridad='Baja', tiempo_respuesta_minutos=60, tiempo_resolucion_minutos=240)
 
@@ -62,3 +63,23 @@ class TicketFormsTests(TestCase):
             'usuario': self.user.ID_empleado,
         }, instance=ticket)
         self.assertTrue(form.is_valid(), form.errors)
+
+    def test_creation_form_limits_assets_to_usuario(self):
+        other = usuario.objects.create_user(ID_empleado='2002', username='other', password='Pass1234!')
+        categoria = activos_categoria.objects.get(codigo='MON')
+        activo_otro = activos.objects.create(
+            codigo='ETR-01-TI-MON-0002',
+            categoria=categoria,
+            marca='Samsung',
+            modelo='S24',
+            serial='SER-778',
+            sede=self.sede,
+            departamento=self.depto,
+            estado='activo',
+            usuario_asignado=other,
+        )
+
+        form = TicketCreationForm(usuario=self.user)
+
+        self.assertIn(self.activo, form.fields['activo_afectado'].queryset)
+        self.assertNotIn(activo_otro, form.fields['activo_afectado'].queryset)

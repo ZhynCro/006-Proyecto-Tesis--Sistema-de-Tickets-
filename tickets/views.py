@@ -100,7 +100,7 @@ def tickets_create(request):
         return redirect('login')
 
     if request.method == 'POST':
-        form = TicketCreationForm(request.POST)
+        form = TicketCreationForm(request.POST, usuario=current_user)
         if form.is_valid():
             ticket = form.save(commit=False)
             ticket.codigo_ticket = _next_ticket_code()
@@ -114,7 +114,7 @@ def tickets_create(request):
             messages.success(request, 'Ticket creado correctamente.')
             return redirect('tickets_view')
     else:
-        form = TicketCreationForm()
+        form = TicketCreationForm(usuario=current_user)
 
     return render(request, 'tickets_create.html', {'form': form})
 

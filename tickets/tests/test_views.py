@@ -17,7 +17,7 @@ class TicketViewsTests(TestCase):
         categoria = activos_categoria.objects.create(codigo='CPU', nombre='CPU')
         self.activo = activos.objects.create(
             codigo='ETR-01-OPS-CPU-0001', categoria=categoria, marca='HP', modelo='Elite', serial='SER-456',
-            sede=self.sede, departamento=self.depto, estado='activo'
+            sede=self.sede, departamento=self.depto, estado='activo', usuario_asignado=self.user
         )
         self.na = matriz_prioridad.objects.create(prioridad='N/A', tiempo_respuesta_minutos=30, tiempo_resolucion_minutos=90)
         self.alta = matriz_prioridad.objects.create(prioridad='Alta', tiempo_respuesta_minutos=10, tiempo_resolucion_minutos=30)
@@ -64,3 +64,21 @@ class TicketViewsTests(TestCase):
         response = self.client.get(reverse('tickets_delete'))
         self.assertRedirects(response, reverse('tickets_view'))
         self.assertTrue(tickets.objects.filter(pk=self.ticket.pk).exists())
+
+    def test_tickets_create_form_shows_only_user_assets(self):
+        other = usuario.objects.create_user(ID_empleado='3002', username='otheragent', password='Pass1234!')
+        categoria = activos_categoria.objects.get(codigo='CPU')
+        activo_otro = activos.objects.create(
+            codigo='ETR-01-OPS-CPU-0002', categoria=categoria, marca='Dell', modelo='Opti', serial='SER-457',
+            sede=self.sede, departamento=self.depto, estado='activo', usuario_asignado=other
+        )
+
+        session = self.client.session
+        session['ID_empleado'] = self.user.ID_empleado
+        session.save()
+
+        response = self.client.get(reverse('tickets_create'))
+        queryset = response.context['form'].fields['activo_afectado'].queryset
+
+        self.assertIn(self.activo, queryset)
+        self.assertNotIn(activo_otro, queryset)
