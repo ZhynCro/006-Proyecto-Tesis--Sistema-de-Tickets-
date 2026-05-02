@@ -3,6 +3,7 @@ from django.contrib.auth import authenticate, login, get_user_model, logout
 from django.shortcuts import redirect, render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
+from django.core.paginator import Paginator
 
 from users.forms import UsuarioCreationForm, UsuarioUpdateForm
 from .models import usuario
@@ -87,7 +88,9 @@ def user_view(request):
         .filter(is_active=True)
         .order_by('ID_empleado')
     )
-    return render(request, 'user_view.html', {'usuarios': usuarios})
+    paginator = Paginator(usuarios, 50)
+    page_obj = paginator.get_page(request.GET.get('page'))
+    return render(request, 'user_view.html', {'usuarios': page_obj, 'page_obj': page_obj})
 
 @login_required
 def user_edit(request, user_id):

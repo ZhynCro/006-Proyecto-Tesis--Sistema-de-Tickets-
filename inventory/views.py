@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 
 from inventory.forms import ActivoCreationForm, ActivoUpdateForm
 from inventory.models import activos
@@ -14,7 +15,9 @@ def inventory_view(request):
         .filter(estado__iexact='activo')
         .order_by('codigo')
     )
-    return render(request, 'inventory_view.html', {'activos': activos_registrados})
+    paginator = Paginator(activos_registrados, 50)
+    page_obj = paginator.get_page(request.GET.get('page'))
+    return render(request, 'inventory_view.html', {'activos': page_obj, 'page_obj': page_obj})
 
 @login_required
 def inventory_create(request):

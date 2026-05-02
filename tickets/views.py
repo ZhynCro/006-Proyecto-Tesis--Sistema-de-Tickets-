@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect, render
+from django.core.paginator import Paginator
 from tickets.forms import TicketCreationForm, TicketUpdateForm
 from tickets.models import tickets, matriz_prioridad, tickets_historial
 from users.models import usuario
@@ -66,10 +67,15 @@ def tickets_view(request):
     contexto = {
         'tickets': tickets_registrados,
         'estados': tickets.ESTADO_TYPES,
-        'usuarios_asignados': usuario.objects.filter(is_active=True).order_by('first_name', 'last_name', 'ID_empleado'),
+        'usuarios_asignados': usuario.objects.filter(is_active=True, groups__id__in=[1, 5, 3, 4]).order_by('first_name', 'last_name', 'ID_empleado').distinct(),
         'prioridades': matriz_prioridad.objects.order_by('prioridad'),
         'filtros': filtros,
     }
+
+    paginator = Paginator(tickets_registrados, 50)
+    page_obj = paginator.get_page(request.GET.get('page'))
+    contexto['tickets'] = page_obj
+    contexto['page_obj'] = page_obj
 
     return render(request, 'tickets_view.html', contexto)
 
@@ -82,7 +88,9 @@ def tickets_view_self(request):
             usuario=current_user, estado__iexact='pendiente'
         ).order_by('-fecha_creacion')
 
-    return render(request, 'tickets_view_self.html', {'tickets': tickets_asignados})
+    paginator = Paginator(tickets_asignados, 50)
+    page_obj = paginator.get_page(request.GET.get('page'))
+    return render(request, 'tickets_view_self.html', {'tickets': page_obj, 'page_obj': page_obj})
 
 @login_required
 def tickets_view_pending(request):
@@ -90,7 +98,9 @@ def tickets_view_pending(request):
         estado__iexact='pendiente'
     ).order_by('-fecha_creacion')
 
-    return render(request, 'tickets_view_pending.html', {'tickets': tickets_pendientes})
+    paginator = Paginator(tickets_pendientes, 50)
+    page_obj = paginator.get_page(request.GET.get('page'))
+    return render(request, 'tickets_view_pending.html', {'tickets': page_obj, 'page_obj': page_obj})
 
 def tickets_create(request):
     current_user = _get_current_usuario(request)

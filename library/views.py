@@ -3,6 +3,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import FileResponse, Http404, HttpResponse
+from django.core.paginator import Paginator
 
 
 from .forms import TutorialForm
@@ -16,7 +17,9 @@ import os
 @login_required
 def library_view(request):
     tutoriales = Tutorial.objects.all().order_by('-creado_en')
-    return render(request, 'library_view.html', {'tutoriales': tutoriales})
+    paginator = Paginator(tutoriales, 50)
+    page_obj = paginator.get_page(request.GET.get('page'))
+    return render(request, 'library_view.html', {'tutoriales': page_obj, 'page_obj': page_obj})
 
 
 @login_required
