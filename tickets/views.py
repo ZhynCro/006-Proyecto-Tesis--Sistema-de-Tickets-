@@ -190,10 +190,12 @@ def ticket_detail(request, ticket_id):
     else:
         form = TicketCommentForm()
 
-    can_process = ticket.estado == 'En Progreso' and (
-        ticket.usuario == current_user or current_user.is_superuser or
-        current_user.groups.filter(name__in=['Supervisor', 'Tecnico']).exists()
-    )
+    can_process = False
+    if current_user and ticket.estado == 'En Progreso':
+        is_assigned = ticket.usuario_id == current_user.ID_empleado
+        is_superuser = getattr(current_user, 'is_superuser', False)
+        is_tech_or_supervisor = current_user.groups.filter(name__in=['Tecnico', 'Supervisor']).exists()
+        can_process = is_assigned or is_superuser or is_tech_or_supervisor
 
     if request.method == 'POST' and 'procesar' in request.POST:
         if can_process:
@@ -249,9 +251,11 @@ def ticket_resolve(request, ticket_id):
     else:
         form = TicketCommentForm()
 
-    can_approve = ticket.estado == 'Resuelto' and (
-        current_user.is_superuser or current_user.groups.filter(name='Supervisor').exists()
-    )
+    can_approve = False
+    if current_user and ticket.estado == 'Resuelto':
+        is_superuser = getattr(current_user, 'is_superuser', False)
+        is_supervisor = current_user.groups.filter(name='Supervisor').exists()
+        can_approve = is_superuser or is_supervisor
 
     if request.method == 'POST' and 'aprobar' in request.POST:
         if can_approve:

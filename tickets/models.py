@@ -1,4 +1,17 @@
+import os
+import uuid
 from django.db import models
+from django.utils import timezone
+
+
+def comentario_adjunto_path(instance, filename):
+    fecha = timezone.now().strftime('%Y-%m-%d')
+    ticket_code = instance.ticket.codigo_ticket
+    ext = os.path.splitext(filename)[1].lower()
+    unique_id = uuid.uuid4().hex[:8]
+    new_name = f"{ticket_code}_{fecha}_{unique_id}{ext}"
+    return os.path.join('tickets_adjuntos', new_name)
+
 
 class matriz_prioridad(models.Model):
     prioridad = models.CharField(max_length=20, unique=True)
@@ -77,7 +90,7 @@ class tickets_comentarios(models.Model):
         related_name='comentarios_autor',
     )
     mensaje = models.TextField()
-    archivo_adjunto = models.FileField(upload_to='tickets_adjuntos/', null=True, blank=True)
+    archivo_adjunto = models.FileField(upload_to=comentario_adjunto_path, null=True, blank=True)
     fecha_registro = models.DateTimeField(auto_now_add=True)
 
 
