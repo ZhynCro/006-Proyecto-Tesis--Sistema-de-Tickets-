@@ -23,7 +23,7 @@ class activos(models.Model):
     )
     marca = models.CharField(max_length=50)
     modelo = models.CharField(max_length=50)
-    serial = models.CharField(max_length=50, unique=True)
+    serial = models.CharField(max_length=50)
     sede = models.ForeignKey(
         'users.sede',
         on_delete=models.PROTECT,
@@ -42,7 +42,7 @@ class activos(models.Model):
     departamento = models.ForeignKey(
         'users.departamento',
         on_delete=models.PROTECT,
-        to_field='nombre',
+        to_field='codigo',
         db_column='departamento',
         related_name='activos'
     )
