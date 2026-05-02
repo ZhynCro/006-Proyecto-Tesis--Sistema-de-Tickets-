@@ -1,13 +1,25 @@
 {% extends 'base.html' %}
 
-{% block title %}Pendientes{% endblock %}
+{% block title %}Tickets Resueltos{% endblock %}
 
 {% block content %}
-
 <div class="space-y-6">
-    <div>
-        <h1 class="text-2xl font-bold">Tickets pendientes</h1>
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+            <h1 class="text-2xl font-bold">Tickets Resueltos</h1>
+            <p class="text-sm text-gray-500">Tickets pendientes de aprobación</p>
+        </div>
     </div>
+
+    {% if messages %}
+        <div class="space-y-2">
+            {% for message in messages %}
+                <div class="alert {% if message.tags == 'error' %}alert-error{% else %}alert-success{% endif %}">
+                    <span>{{ message }}</span>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
 
     <div class="overflow-x-auto bg-base-100 rounded-lg shadow">
         <table class="table w-full">
@@ -15,8 +27,10 @@
                 <tr>
                     <th>Código</th>
                     <th>Título</th>
+                    <th>Estado</th>
                     <th>Creado</th>
                     <th>Activo afectado</th>
+                    <th>Prioridad</th>
                     <th>Solicitante</th>
                     <th>Asignado a</th>
                     <th>Acciones</th>
@@ -25,23 +39,21 @@
             <tbody>
                 {% for ticket in tickets %}
                     <tr>
-                        <td><a href="{% url 'ticket_detail' ticket.id %}" class="link link-primary font-mono text-sm">{{ ticket.codigo_ticket }}</a></td>
+                        <td><a href="{% url 'ticket_resolve' ticket.id %}" class="link link-primary font-mono text-sm">{{ ticket.codigo_ticket }}</a></td>
                         <td>{{ ticket.titulo }}</td>
+                        <td>{{ ticket.estado }}</td>
                         <td>{{ ticket.fecha_creacion }}</td>
                         <td>{{ ticket.activo_afectado }}</td>
+                        <td>{{ ticket.prioridad }}</td>
                         <td>{{ ticket.solicitante }}</td>
                         <td>{{ ticket.usuario|default:'Sin asignar' }}</td>
                         <td>
-                            {% if perms.tickets.change_tickets %}
-                            <a href="{% url 'tickets_edit' ticket.id %}" class="btn btn-ghost btn-xs">Editar</a>
-                            {% else %}
-                            <span class="text-gray-400 text-xs">Sin acciones</span>
-                            {% endif %}
+                            <a href="{% url 'ticket_resolve' ticket.id %}" class="btn btn-ghost btn-xs">Aprobar</a>
                         </td>
                     </tr>
                 {% empty %}
                     <tr>
-                        <td colspan="7" class="text-center text-gray-500 py-6">No hay tickets pendientes.</td>
+                        <td colspan="9" class="text-center text-gray-500 py-6">No hay tickets resueltos pendientes.</td>
                     </tr>
                 {% endfor %}
             </tbody>

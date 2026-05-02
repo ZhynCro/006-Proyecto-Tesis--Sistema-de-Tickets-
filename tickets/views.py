@@ -3,8 +3,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect, render
 from django.core.paginator import Paginator
-from tickets.forms import TicketCreationForm, TicketUpdateForm
-from tickets.models import tickets, matriz_prioridad, tickets_historial
+from tickets.forms import TicketCreationForm, TicketUpdateForm, TicketCommentForm
+from tickets.models import tickets, matriz_prioridad, tickets_historial, tickets_comentarios
 from users.models import usuario
 from django.utils import timezone
 
@@ -170,3 +170,110 @@ def tickets_delete(request):
         messages.error(request, 'No se encontraron tickets para borrar.')
 
     return redirect('tickets_view')
+
+
+@login_required
+def ticket_detail(request, ticket_id):
+    ticket = get_object_or_404(tickets, pk=ticket_id)
+    comentarios = ticket.comentarios.select_related('autor').order_by('fecha_registro')
+    current_user = _get_current_usuario(request)
+
+    if request.method == 'POST' and 'comentario' in request.POST:
+        form = TicketCommentForm(request.POST, request.FILES)
+        if form.is_valid():
+            comentario = form.save(commit=False)
+            comentario.ticket = ticket
+            comentario.autor = current_user
+            comentario.save()
+            messages.success(request, 'Comentario agregado correctamente.')
+            return redirect('ticket_detail', ticket_id=ticket_id)
+    else:
+        form = TicketCommentForm()
+
+    can_process = ticket.estado == 'En Progreso' and (
+        ticket.usuario == current_user or current_user.is_superuser or
+        current_user.groups.filter(name__in=['Supervisor', 'Tecnico']).exists()
+    )
+
+    if request.method == 'POST' and 'procesar' in request.POST:
+        if can_process:
+            estado_anterior = ticket.estado
+            ticket.estado = 'Resuelto'
+            ticket.fecha_resolucion = timezone.now()
+            ticket.save()
+            historial = tickets_historial(
+                estado_anterior=estado_anterior,
+                estado_nuevo='Resuelto',
+                fecha_cambio=timezone.now(),
+                responsable=current_user,
+                ticket_id=ticket,
+            )
+            historial.save()
+            messages.success(request, 'Ticket marcado como Resuelto.')
+            return redirect('ticket_detail', ticket_id=ticket_id)
+
+    contexto = {
+        'ticket': ticket,
+        'comentarios': comentarios,
+        'form': form,
+        'can_process': can_process,
+    }
+    return render(request, 'ticket_detail.html', contexto)
+
+
+@login_required
+def tickets_view_resolved(request):
+    tickets_resueltos = tickets.objects.select_related('activo_afectado', 'prioridad', 'solicitante', 'usuario').filter(
+        estado='Resuelto'
+    ).order_by('-fecha_creacion')
+
+    paginator = Paginator(tickets_resueltos, 50)
+    page_obj = paginator.get_page(request.GET.get('page'))
+    return render(request, 'tickets_view_resolved.html', {'tickets': page_obj, 'page_obj': page_obj})
+
+
+@login_required
+def ticket_resolve(request, ticket_id):
+    ticket = get_object_or_404(tickets, pk=ticket_id)
+    comentarios = ticket.comentarios.select_related('autor').order_by('fecha_registro')
+    current_user = _get_current_usuario(request)
+
+    if request.method == 'POST' and 'comentario' in request.POST:
+        form = TicketCommentForm(request.POST, request.FILES)
+        if form.is_valid() and form.cleaned_data.get('mensaje'):
+            comentario = form.save(commit=False)
+            comentario.ticket = ticket
+            comentario.autor = current_user
+            comentario.save()
+            return redirect('ticket_resolve', ticket_id=ticket_id)
+    else:
+        form = TicketCommentForm()
+
+    can_approve = ticket.estado == 'Resuelto' and (
+        current_user.is_superuser or current_user.groups.filter(name='Supervisor').exists()
+    )
+
+    if request.method == 'POST' and 'aprobar' in request.POST:
+        if can_approve:
+            estado_anterior = ticket.estado
+            ticket.estado = 'Cerrado'
+            ticket.fecha_resolucion = timezone.now()
+            ticket.save()
+            historial = tickets_historial(
+                estado_anterior=estado_anterior,
+                estado_nuevo='Cerrado',
+                fecha_cambio=timezone.now(),
+                responsable=current_user,
+                ticket_id=ticket,
+            )
+            historial.save()
+            messages.success(request, 'Resolución aprobada. Ticket cerrado.')
+            return redirect('tickets_view_resolved')
+
+    contexto = {
+        'ticket': ticket,
+        'comentarios': comentarios,
+        'form': form,
+        'can_approve': can_approve,
+    }
+    return render(request, 'ticket_resolve.html', contexto)

@@ -86,6 +86,7 @@
                         {% if perms.tickets.delete_tickets %}
                         <th><input type="checkbox" id="select-all" class="checkbox checkbox-sm" /></th>
                         {% endif %}
+                        <th>Código</th>
                         <th>Título</th>
                         <th>Estado</th>
                         <th>Creado</th>
@@ -105,6 +106,7 @@
                                 <input type="checkbox" name="tickets_seleccionados" value="{{ ticket.id }}" class="checkbox checkbox-sm row-checkbox" />
                             </td>
                             {% endif %}
+                            <td><a href="{% url 'ticket_detail' ticket.id %}" class="link link-primary font-mono text-sm">{{ ticket.codigo_ticket }}</a></td>
                             <td>{{ ticket.titulo }}</td>
                             <td>{{ ticket.estado }}</td>
                             <td>{{ ticket.fecha_creacion }}</td>
@@ -123,7 +125,7 @@
                         </tr>
                     {% empty %}
                         <tr>
-                            <td colspan="{% if perms.tickets.delete_tickets %}10{% else %}9{% endif %}" class="text-center text-gray-500 py-6">No hay tickets registrados.</td>
+                            <td colspan="{% if perms.tickets.delete_tickets %}11{% else %}10{% endif %}" class="text-center text-gray-500 py-6">No hay tickets registrados.</td>
                         </tr>
                     {% endfor %}
                 </tbody>

@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+
+{% block title %}Ticket {{ ticket.codigo_ticket }}{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+            <h1 class="text-2xl font-bold">{{ ticket.codigo_ticket }}</h1>
+            <p class="text-sm text-gray-500">{{ ticket.titulo }}</p>
+        </div>
+        <a href="{% url 'tickets_view' %}" class="btn btn-ghost btn-sm">Volver a la lista</a>
+    </div>
+
+    {% if messages %}
+        <div class="space-y-2">
+            {% for message in messages %}
+                <div class="alert {% if message.tags == 'error' %}alert-error{% else %}alert-success{% endif %}">
+                    <span>{{ message }}</span>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="bg-base-100 rounded-lg shadow p-6">
+        <h2 class="text-lg font-semibold mb-4">Información del Ticket</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <span class="text-sm text-gray-500">Estado</span>
+                <p class="font-medium">{{ ticket.estado }}</p>
+            </div>
+            <div>
+                <span class="text-sm text-gray-500">Prioridad</span>
+                <p class="font-medium">{{ ticket.prioridad }}</p>
+            </div>
+            <div>
+                <span class="text-sm text-gray-500">Solicitante</span>
+                <p class="font-medium">{{ ticket.solicitante }}</p>
+            </div>
+            <div>
+                <span class="text-sm text-gray-500">Asignado a</span>
+                <p class="font-medium">{{ ticket.usuario|default:'Sin asignar' }}</p>
+            </div>
+            <div>
+                <span class="text-sm text-gray-500">Activo afectado</span>
+                <p class="font-medium">{{ ticket.activo_afectado }}</p>
+            </div>
+            <div>
+                <span class="text-sm text-gray-500">Fecha de creación</span>
+                <p class="font-medium">{{ ticket.fecha_creacion }}</p>
+            </div>
+            {% if ticket.fecha_resolucion %}
+            <div>
+                <span class="text-sm text-gray-500">Fecha de resolución</span>
+                <p class="font-medium">{{ ticket.fecha_resolucion }}</p>
+            </div>
+            {% endif %}
+        </div>
+        <div class="mt-4">
+            <span class="text-sm text-gray-500">Descripción</span>
+            <p class="mt-1">{{ ticket.descripcion }}</p>
+        </div>
+    </div>
+
+    {% if can_process %}
+    <div class="flex justify-end">
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" name="procesar" class="btn btn-warning">Procesar</button>
+        </form>
+    </div>
+    {% endif %}
+
+    <div class="bg-base-100 rounded-lg shadow p-6">
+        <h2 class="text-lg font-semibold mb-4">Comentarios</h2>
+
+        <div class="space-y-4 mb-6 max-h-96 overflow-y-auto">
+            {% for comentario in comentarios %}
+                <div class="border border-gray-200 rounded-lg p-4">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="font-medium text-sm">{{ comentario.autor|default:'Anónimo' }}</span>
+                        <span class="text-xs text-gray-500">{{ comentario.fecha_registro }}</span>
+                    </div>
+                    <p class="text-sm">{{ comentario.mensaje }}</p>
+                    {% if comentario.archivo_adjunto %}
+                    <a href="{{ comentario.archivo_adjunto.url }}" class="text-sm link link-primary mt-2" target="_blank">Ver adjunto</a>
+                    {% endif %}
+                </div>
+            {% empty %}
+                <p class="text-sm text-gray-500 text-center py-4">No hay comentarios aún.</p>
+            {% endfor %}
+        </div>
+
+        <form method="post" enctype="multipart/form-data" class="border-t pt-4">
+            {% csrf_token %}
+            <input type="hidden" name="comentario" value="1">
+            <div class="space-y-3">
+                <div>
+                    <label for="id_mensaje" class="block text-sm font-medium mb-1">Nuevo comentario</label>
+                    {{ form.mensaje }}
+                    {% for error in form.mensaje.errors %}
+                        <p class="text-xs text-error mt-1">{{ error }}</p>
+                    {% endfor %}
+                </div>
+                <div>
+                    <label for="id_archivo_adjunto" class="block text-sm font-medium mb-1">Archivo adjunto (opcional)</label>
+                    {{ form.archivo_adjunto }}
+                    {% for error in form.archivo_adjunto.errors %}
+                        <p class="text-xs text-error mt-1">{{ error }}</p>
+                    {% endfor %}
+                </div>
+                <button type="submit" class="btn btn-primary btn-sm">Agregar comentario</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

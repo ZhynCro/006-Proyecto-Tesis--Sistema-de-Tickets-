@@ -1,6 +1,27 @@
 from django import forms
-from .models import tickets
+from .models import tickets, tickets_comentarios
 from inventory.models import activos
+
+
+class TicketCommentForm(forms.ModelForm):
+    class Meta:
+        model = tickets_comentarios
+        fields = ('mensaje', 'archivo_adjunto')
+        widgets = {
+            'mensaje': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Escribe un comentario...'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['mensaje'].widget.attrs.setdefault(
+            'class',
+            'w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-300',
+        )
+        self.fields['archivo_adjunto'].widget.attrs.setdefault(
+            'class',
+            'file-input file-input-bordered w-full',
+        )
+
 
 class TicketCreationForm(forms.ModelForm):
     class Meta:

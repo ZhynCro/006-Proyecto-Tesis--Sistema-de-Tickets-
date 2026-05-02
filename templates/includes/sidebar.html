@@ -12,6 +12,9 @@
           <li><a href="{% url 'tickets_view' %}">Todos los tickets</a></li>
           <li><a href="{% url 'tickets_view_self' %}">Asignados a mí</a></li>
           <li><a href="{% url 'tickets_view_pending' %}">Pendientes</a></li>
+          {% if request.user.is_superuser or request.user.groups.filter.name == 'Supervisor' %}
+          <li><a href="{% url 'tickets_view_resolved' %}">Resueltos</a></li>
+          {% endif %}
         </ul>
       </details>
     </li>
