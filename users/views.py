@@ -58,7 +58,13 @@ def admin_login_view(request):
 
         login(request, user)
         request.session['admin_login'] = True
-        return redirect('dashboard_view')
+
+        if user.groups.filter(name='Tecnico').exists():
+            return redirect('tickets_view_self')
+        elif user.groups.filter(name='Supervisor').exists():
+            return redirect('tickets_view_pending')
+        else:
+            return redirect('dashboard_view')
 
     return render(request, 'login_admin.html')
 
