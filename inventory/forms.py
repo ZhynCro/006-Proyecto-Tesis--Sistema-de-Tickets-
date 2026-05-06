@@ -2,6 +2,7 @@ from django import forms
 from inventory.models import activos
 from django.core.exceptions import ValidationError
 from django.db.models import Max
+from users.models import usuario
 
 
 class ActivoCreationForm(forms.ModelForm):
@@ -18,12 +19,13 @@ class ActivoCreationForm(forms.ModelForm):
         )
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        for field in self.fields.values():
-            field.widget.attrs.setdefault(
-                'class',
-                'w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-300',
-            )
+            super().__init__(*args, **kwargs)
+            self.fields['usuario_asignado'].queryset = usuario.objects.filter(is_active=True).order_by('first_name', 'last_name')
+            for field in self.fields.values():
+                field.widget.attrs.setdefault(
+                    'class',
+                    'w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-300',
+                )
 
     def _get_next_correlativo(self, prefijo_codigo):
         ultimo_codigo = (
@@ -94,6 +96,7 @@ class ActivoUpdateForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields['usuario_asignado'].queryset = usuario.objects.filter(is_active=True).order_by('first_name', 'last_name')
         for field in self.fields.values():
             field.widget.attrs.setdefault(
                 'class',
