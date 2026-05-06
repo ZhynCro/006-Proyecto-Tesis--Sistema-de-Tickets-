@@ -1,6 +1,7 @@
 from django import forms
 from .models import tickets, tickets_comentarios
 from inventory.models import activos
+from users.models import usuario
 import os
 from django.core.exceptions import ValidationError
 
@@ -91,6 +92,9 @@ class TicketUpdateForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields['usuario'].queryset = usuario.objects.filter(
+            is_active=True, groups__name__in=['Tecnico', 'Supervisor']
+        ).order_by('first_name', 'last_name', 'ID_empleado').distinct()
         for field in self.fields.values():
             field.widget.attrs.setdefault(
                 'class',
