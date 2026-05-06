@@ -24,6 +24,97 @@
         </div>
     {% endif %}
 
+<form method="get" class="space-y-4">
+        <div class="form-control">
+            <div class="join w-full">
+                <input type="text" name="q" value="{{ filtros.q }}" placeholder="Buscar por código o serial..." class="input input-bordered join-item flex-1 h-10" />
+                <button type="submit" class="btn btn-ghost join-item h-10 px-3">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </button>
+                <button type="button" id="toggle-filters" class="btn btn-outline join-item h-10">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                    </svg>
+                    Filtros
+                    {% if filtros_activos > 0 %}
+                    <span class="badge badge-primary badge-sm">{{ filtros_activos }}</span>
+                    {% endif %}
+                </button>
+            </div>
+        </div>
+
+        <div id="filters-panel" class="{% if filtros_activos == 0 %}hidden{% endif %}">
+            <div class="rounded-lg bg-base-100 p-4 shadow">
+                <div class="flex flex-wrap gap-4">
+                    <div class="form-control min-w-40 flex-1">
+                        <label class="label" for="modelo">
+                            <span class="label-text">Modelo</span>
+                        </label>
+                        <select id="modelo" name="modelo" class="select select-bordered select-sm w-full">
+                            <option value="">Todos</option>
+                            {% for modelo_item in modelos %}
+                                <option value="{{ modelo_item }}" {% if filtros.modelo == modelo_item %}selected{% endif %}>{{ modelo_item }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-control min-w-40 flex-1">
+                        <label class="label" for="usuario">
+                            <span class="label-text">Usuario asignado</span>
+                        </label>
+                        <select id="usuario" name="usuario" class="select select-bordered select-sm w-full">
+                            <option value="">Todos</option>
+                            {% for usuario_item in usuarios %}
+                                <option value="{{ usuario_item.ID_empleado }}" {% if filtros.usuario == usuario_item.ID_empleado %}selected{% endif %}>{{ usuario_item.get_full_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-control min-w-40 flex-1">
+                        <label class="label" for="categoria">
+                            <span class="label-text">Categoría</span>
+                        </label>
+                        <select id="categoria" name="categoria" class="select select-bordered select-sm w-full">
+                            <option value="">Todas</option>
+                            {% for cat in categorias %}
+                                <option value="{{ cat.nombre }}" {% if filtros.categoria == cat.nombre %}selected{% endif %}>{{ cat.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-control min-w-40 flex-1">
+                        <label class="label" for="sede">
+                            <span class="label-text">Sede</span>
+                        </label>
+                        <select id="sede" name="sede" class="select select-bordered select-sm w-full">
+                            <option value="">Todas</option>
+                            {% for sede_item in sedes %}
+                                <option value="{{ sede_item.codigo }}" {% if filtros.sede == sede_item.codigo %}selected{% endif %}>{{ sede_item.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-control min-w-40 flex-1">
+                        <label class="label" for="departamento">
+                            <span class="label-text">Departamento</span>
+                        </label>
+                        <select id="departamento" name="departamento" class="select select-bordered select-sm w-full">
+                            <option value="">Todos</option>
+                            {% for dep in departamentos %}
+                                <option value="{{ dep.codigo }}" {% if filtros.departamento == dep.codigo %}selected{% endif %}>{{ dep.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-2 mt-4">
+                    <a href="{% url 'inventory_view' %}" class="btn btn-ghost">Limpiar</a>
+                    <button type="submit" class="btn btn-primary">Filtrar</button>
+                </div>
+            </div>
+        </div>
+    </form>
+
     <form method="post" action="{% url 'inventory_delete' %}" class="space-y-4">
         {% csrf_token %}
         <div class="flex justify-end">
@@ -91,17 +182,17 @@
     <div class="flex justify-center mt-4">
         <div class="join">
             {% if page_obj.has_previous %}
-            <a href="?page={{ page_obj.previous_page_number }}" class="join-item btn btn-sm">&laquo;</a>
+            <a href="?page={{ page_obj.previous_page_number }}{% if filtros.q %}&q={{ filtros.q }}{% endif %}{% if filtros.modelo %}&modelo={{ filtros.modelo }}{% endif %}{% if filtros.usuario %}&usuario={{ filtros.usuario }}{% endif %}{% if filtros.categoria %}&categoria={{ filtros.categoria }}{% endif %}{% if filtros.sede %}&sede={{ filtros.sede }}{% endif %}{% if filtros.departamento %}&departamento={{ filtros.departamento }}{% endif %}" class="join-item btn btn-sm">&laquo;</a>
             {% endif %}
             {% for num in page_obj.paginator.page_range %}
                 {% if num == page_obj.number %}
                 <button class="join-item btn btn-sm btn-active">{{ num }}</button>
                 {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-                <a href="?page={{ num }}" class="join-item btn btn-sm">{{ num }}</a>
+                <a href="?page={{ num }}{% if filtros.q %}&q={{ filtros.q }}{% endif %}{% if filtros.modelo %}&modelo={{ filtros.modelo }}{% endif %}{% if filtros.usuario %}&usuario={{ filtros.usuario }}{% endif %}{% if filtros.categoria %}&categoria={{ filtros.categoria }}{% endif %}{% if filtros.sede %}&sede={{ filtros.sede }}{% endif %}{% if filtros.departamento %}&departamento={{ filtros.departamento }}{% endif %}" class="join-item btn btn-sm">{{ num }}</a>
                 {% endif %}
             {% endfor %}
             {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}" class="join-item btn btn-sm">&raquo;</a>
+            <a href="?page={{ page_obj.next_page_number }}{% if filtros.q %}&q={{ filtros.q }}{% endif %}{% if filtros.modelo %}&modelo={{ filtros.modelo }}{% endif %}{% if filtros.usuario %}&usuario={{ filtros.usuario }}{% endif %}{% if filtros.categoria %}&categoria={{ filtros.categoria }}{% endif %}{% if filtros.sede %}&sede={{ filtros.sede }}{% endif %}{% if filtros.departamento %}&departamento={{ filtros.departamento }}{% endif %}" class="join-item btn btn-sm">&raquo;</a>
             {% endif %}
         </div>
     </div>
@@ -109,6 +200,15 @@
 </div>
 
 <script>
+    const toggleBtn = document.getElementById('toggle-filters');
+    const filtersPanel = document.getElementById('filters-panel');
+
+    if (toggleBtn) {
+        toggleBtn.addEventListener('click', () => {
+            filtersPanel.classList.toggle('hidden');
+        });
+    }
+
     const deleteButton = document.getElementById('delete-button');
     const checkboxes = document.querySelectorAll('.row-checkbox');
     const selectAll = document.getElementById('select-all');
