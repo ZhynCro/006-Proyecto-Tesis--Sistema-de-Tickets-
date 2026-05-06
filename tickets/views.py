@@ -86,7 +86,7 @@ def tickets_view_self(request):
     tickets_asignados = tickets.objects.none()
     if current_user:
         tickets_asignados = tickets.objects.select_related('activo_afectado', 'prioridad', 'solicitante', 'usuario').filter(
-            usuario=current_user, estado__iexact='pendiente'
+            usuario=current_user, estado__in=['Pendiente', 'En Progreso']
         ).order_by('-fecha_creacion')
 
     paginator = Paginator(tickets_asignados, settings.PAGINATION_PER_PAGE)

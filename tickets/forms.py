@@ -93,7 +93,7 @@ class TicketUpdateForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['usuario'].queryset = usuario.objects.filter(
-            is_active=True, groups__name__in=['Tecnico', 'Supervisor']
+            is_active=True, groups__name__in=['Tecnico', 'Supervisor', 'Gerente', 'Superadmin']
         ).order_by('first_name', 'last_name', 'ID_empleado').distinct()
         for field in self.fields.values():
             field.widget.attrs.setdefault(
