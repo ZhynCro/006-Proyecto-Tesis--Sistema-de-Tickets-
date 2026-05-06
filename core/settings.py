@@ -141,6 +141,9 @@ TAILWIND_APP_NAME = 'theme'
 
 NPM_BIN_PATH = r"C:\nvm4w\nodejs\npm.cmd"
 
+# Paginación
+PAGINATION_PER_PAGE = 25
+
 # Configuración para archivos multimedia
 
 MEDIA_URL = 'media/'

@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect, render
 from django.core.paginator import Paginator
+from django.conf import settings
 from tickets.forms import TicketCreationForm, TicketUpdateForm, TicketCommentForm
 from tickets.models import tickets, matriz_prioridad, tickets_historial, tickets_comentarios
 from users.models import usuario
@@ -72,7 +73,7 @@ def tickets_view(request):
         'filtros': filtros,
     }
 
-    paginator = Paginator(tickets_registrados, 50)
+    paginator = Paginator(tickets_registrados, settings.PAGINATION_PER_PAGE)
     page_obj = paginator.get_page(request.GET.get('page'))
     contexto['tickets'] = page_obj
     contexto['page_obj'] = page_obj
@@ -88,7 +89,7 @@ def tickets_view_self(request):
             usuario=current_user, estado__iexact='pendiente'
         ).order_by('-fecha_creacion')
 
-    paginator = Paginator(tickets_asignados, 50)
+    paginator = Paginator(tickets_asignados, settings.PAGINATION_PER_PAGE)
     page_obj = paginator.get_page(request.GET.get('page'))
     return render(request, 'tickets_view_self.html', {'tickets': page_obj, 'page_obj': page_obj})
 
@@ -98,7 +99,7 @@ def tickets_view_pending(request):
         estado__iexact='pendiente'
     ).order_by('-fecha_creacion')
 
-    paginator = Paginator(tickets_pendientes, 50)
+    paginator = Paginator(tickets_pendientes, settings.PAGINATION_PER_PAGE)
     page_obj = paginator.get_page(request.GET.get('page'))
     return render(request, 'tickets_view_pending.html', {'tickets': page_obj, 'page_obj': page_obj})
 
@@ -229,7 +230,7 @@ def tickets_view_resolved(request):
         estado='Resuelto'
     ).order_by('-fecha_creacion')
 
-    paginator = Paginator(tickets_resueltos, 50)
+    paginator = Paginator(tickets_resueltos, settings.PAGINATION_PER_PAGE)
     page_obj = paginator.get_page(request.GET.get('page'))
     return render(request, 'tickets_view_resolved.html', {'tickets': page_obj, 'page_obj': page_obj})
 
