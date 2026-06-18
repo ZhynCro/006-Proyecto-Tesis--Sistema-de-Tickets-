@@ -1,5 +1,12 @@
 # Entorno Virtual
 .env/
+.venv/
+
+# Variables de entorno (NUNCA subir a Git)
+.env
+
+# Agentes de IA
+.agents/
 
 # Python compilado
 **/__pycache__/
@@ -11,3 +18,12 @@ db.sqlite3
 
 # Archivos de medios subidos por usuarios
 /media/
+
+# Archivos estáticos compilados (collectstatic)
+/staticfiles/
+
+# Logs
+/logs/
+
+# Dump de datos para migración
+datadump.json
