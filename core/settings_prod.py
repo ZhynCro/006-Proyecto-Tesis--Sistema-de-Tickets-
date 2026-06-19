@@ -69,7 +69,7 @@ MEDIA_ROOT = os.environ.get('MEDIA_ROOT', BASE_DIR / 'media')
 # ---------------------------------------------------------------------------
 # Eliminar apps y middleware de desarrollo
 # ---------------------------------------------------------------------------
-_DEV_APPS = {'django_browser_reload', 'tailwind'}
+_DEV_APPS = {'django_browser_reload'}
 INSTALLED_APPS = [app for app in INSTALLED_APPS if app not in _DEV_APPS]
 
 _DEV_MIDDLEWARE = {'django_browser_reload.middleware.BrowserReloadMiddleware'}
