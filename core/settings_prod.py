@@ -49,7 +49,7 @@ DATABASES = {
 # Archivos estáticos — WhiteNoise
 # ---------------------------------------------------------------------------
 STATIC_URL = '/static/'
-STATIC_ROOT = os.environ.get('STATIC_ROOT', BASE_DIR / 'staticfiles')
+STATIC_ROOT = os.environ.get('STATIC_ROOT', '/var/www/tickets/static/')
 
 # Insertar WhiteNoise justo después de SecurityMiddleware
 MIDDLEWARE = [MIDDLEWARE[0], 'whitenoise.middleware.WhiteNoiseMiddleware'] + MIDDLEWARE[1:]
